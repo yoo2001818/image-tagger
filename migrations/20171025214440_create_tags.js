@@ -4,6 +4,7 @@ exports.up = async knex => {
     table.string('name').index();
     table.string('color').index();
     table.boolean('is_global').index();
+    table.timestamps();
   });
   await knex.schema.createTable('tags_children', table => {
     table.string('parent_id').index().references('tags.id')

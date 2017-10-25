@@ -3,8 +3,6 @@ import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import { AppContainer } from 'react-hot-loader';
 
-import * as sessionActions from './action/session';
-
 import './style/index.scss';
 
 // Since react-hot-loader should be able to replace this, we're using let for
@@ -17,8 +15,6 @@ container.id = 'root';
 document.body.appendChild(container);
 
 let store = createStore();
-// Initially call session/fetch in here.
-store.dispatch(sessionActions.fetch());
 
 function renderApp() {
   render(

@@ -5,6 +5,7 @@ exports.up = async knex => {
     table.string('path').index();
     table.boolean('is_processed').index();
     table.boolean('is_ignored').index();
+    table.timestamps();
   });
   await knex.schema.createTable('images_tags', table => {
     table.increments('id').primary();

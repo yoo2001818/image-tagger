@@ -41,7 +41,7 @@ app.use((req, res) => {
         <meta name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1">
         <meta charset="UTF-8">
-        <title>Image</title>
+        <title>image-tagger</title>
         <link rel="stylesheet" type="text/css" href="/assets/bundle.css">
       </head>
       <body>

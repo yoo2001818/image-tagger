@@ -14,6 +14,7 @@ bookshelf.plugin('pagination');
 
 export const Tag = bookshelf.Model.extend({
   tableName: 'tags',
+  hasTimestamps: true,
   images() {
     return this.belongsToMany(Image).through(ImageTag);
   },
@@ -30,6 +31,7 @@ export const Tag = bookshelf.Model.extend({
 
 export const Image = bookshelf.Model.extend({
   tableName: 'images',
+  hasTimestamps: true,
   tags() {
     return this.belongsToMany(Tag).through(ImageTag);
   },
