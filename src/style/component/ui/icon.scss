@@ -1,0 +1,93 @@
+.load-icon {
+  @include fa-icon();
+  &.big {
+    font-size: 4em;
+  }
+  animation: load-spin 2s infinite linear;
+  &:before {
+    content: $fa-var-cog;
+  }
+}
+
+@keyframes load-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.icon-left {
+  margin-left: 0.3em;
+}
+
+.icon-right {
+  margin-right: 0.3em;
+}
+
+.times-icon {
+  @include fa-icon();
+  &:before {
+    content: $fa-var-times;
+  }
+}
+
+.download-icon {
+  @include fa-icon();
+  vertical-align: middle;
+  &:before {
+    content: $fa-var-cloud-download;
+  }
+}
+
+.upload-icon {
+  @include fa-icon();
+  vertical-align: middle;
+  &:before {
+    content: $fa-var-cloud-upload;
+  }
+}
+
+.save-icon {
+  @include fa-icon();
+  vertical-align: middle;
+  &:before {
+    content: $fa-var-floppy-o;
+  }
+}
+
+.trash-icon {
+  @include fa-icon();
+  &:before {
+    content: $fa-var-trash;
+  }
+}
+
+.minus-icon {
+  @include fa-icon();
+  &:before {
+    content: $fa-var-minus;
+  }
+}
+
+.plus-icon {
+  @include fa-icon();
+  &:before {
+    content: $fa-var-plus;
+  }
+}
+
+.undo-icon {
+  @include fa-icon();
+  &:before {
+    content: $fa-var-undo;
+  }
+}
+
+.check-icon {
+  @include fa-icon();
+  &:before {
+    content: $fa-var-check;
+  }
+}

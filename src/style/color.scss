@@ -1,0 +1,72 @@
+// Primary color definition
+
+$grey-000: #ffffff;
+$grey-100: #f8f8f8;
+$grey-200: #ebebed;
+$grey-300: #dbdbdd;
+$grey-400: #c8c8cb;
+$grey-500: #9f9fa3;
+$grey-600: #7e7e85;
+$grey-700: #53535a;
+$grey-800: #303033;
+
+$blue-100: #f2fafe;
+$blue-200: #cfedfd;
+$blue-300: #a6ddfc;
+$blue-400: #82cffb;
+$blue-500: #4eb6f2;
+$blue-600: #48c8ee;
+$blue-700: #35c5f0;
+$blue-800: #086ca4;
+
+$green-100: #f2fcec;
+$green-200: #e3f8d4;
+$green-300: #cbf2b0;
+$green-400: #b6ec90;
+$green-500: #95de62;
+$green-600: #68c328;
+$green-700: #5dae26;
+$green-800: #4a9319;
+
+$orange-100: #fdf7eb;
+$orange-200: #fdefcf;
+$orange-300: #fce1a6;
+$orange-400: #fbd481;
+$orange-500: #f9b847;
+$orange-600: #f79618;
+$orange-700: #de7504;
+$orange-800: #c96901;
+
+$red-100: #feecec;
+$red-200: #fdcfcf;
+$red-300: #fca6a6;
+$red-400: #f88484;
+$red-500: #f94747;
+$red-600: #ff7777;
+$red-700: #e45252;
+$red-800: #a60606;
+
+// UI color definition
+
+$bg-color: $grey-000;
+$fg-color: $grey-800;
+
+$header-bg-color: $grey-000;
+$header-title-color: $blue-600;
+$header-color: $grey-700;
+$header-border-color: $grey-300;
+
+$sidebar-header-bg-color: $grey-000;
+$sidebar-header-color: $grey-700;
+$sidebar-header-border-color: $grey-500;
+
+$sidebar-color: $grey-000;
+$sidebar-border-color: $grey-300;
+$sidebar-overlay-color: rgba(#000, 0.5);
+
+$sidebar-title-color: $grey-600;
+$sidebar-menu-color: $grey-700;
+$sidebar-hover-fg-color: $blue-800;
+$sidebar-hover-bg-color: $blue-200;
+$sidebar-active-fg-color: $blue-100;
+$sidebar-active-bg-color: $blue-600;
