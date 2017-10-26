@@ -36,7 +36,8 @@
     "knex": "^0.13.0",
     "morgan": "^1.8.2",
     "serve-static": "^1.12.4",
-    "sqlite3": "^3.1.11"
+    "sqlite3": "^3.1.11",
+    "walk": "^2.3.9"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",
