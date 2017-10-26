@@ -2,7 +2,7 @@ exports.up = async knex => {
   await knex.schema.createTable('images', table => {
     table.increments('id').primary();
     table.integer('random_id').index();
-    table.string('path').index();
+    table.string('path').unique();
     table.boolean('is_processed').index();
     table.boolean('is_ignored').index();
     table.timestamps();
