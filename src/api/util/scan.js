@@ -7,6 +7,7 @@ export default function scan() {
   return new Promise((resolve, reject) => {
     let walker = walk(config.directory, { followLinks: true });
     let queue = [];
+    let appendCount = 0;
     async function processQueue() {
       // Extract file path
       let paths = queue.map(({ root, stat }) => path.resolve(root, stat.name));
@@ -25,13 +26,16 @@ export default function scan() {
           existingId++;
         }
       }
-      // Insert to the database
-      await knex.from('images').insert(appends.map(path => ({
-        path,
-        random_id: Math.random() * 0x7FFFFFFF | 0,
-        is_processed: false,
-        is_ignored: false,
-      })));
+      appendCount += appends.length;
+      if (appends.length > 0) {
+        // Insert to the database
+        await knex.from('images').insert(appends.map(path => ({
+          path,
+          random_id: Math.random() * 0x7FFFFFFF | 0,
+          is_processed: false,
+          is_ignored: false,
+        })));
+      }
       // Empty the queue
       queue = [];
     }
@@ -50,7 +54,7 @@ export default function scan() {
       next();
     });
     walker.on('end', () => {
-      processQueue().then(() => resolve(), err => reject(err));
+      processQueue().then(() => resolve(appendCount), err => reject(err));
     });
   });
 }
