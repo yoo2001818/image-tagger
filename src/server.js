@@ -7,10 +7,6 @@ import morgan from 'morgan';
 import { network as networkConfig } from '../config';
 import api from './api';
 
-import scan from './api/util/scan';
-
-scan().catch(v => console.error(v.stack));
-
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 const httpServer = http.createServer();

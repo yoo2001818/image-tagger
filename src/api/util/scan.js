@@ -34,6 +34,7 @@ export default function scan() {
           random_id: Math.random() * 0x7FFFFFFF | 0,
           is_processed: false,
           is_ignored: false,
+          created_at: new Date(),
         })));
       }
       // Empty the queue
