@@ -14,13 +14,13 @@ router.get('/', async(req, res) => {
   const { next_id: nextId, is_processed: isProcessed } = req.query;
   let query = Image.forge().orderBy('random_id', 'asc');
   if (isProcessed != null) {
-    query = query.where('is_processed',
+    query = query.where('is_processed', '=',
       ['1', 'true', 'yes'].includes(isProcessed));
   }
   if (nextId != null) {
     query = query.where('random_id', '<', nextId);
   }
-  let items = await query.fetchPage({ limit: 21 });
+  let items = (await query.fetchPage({ limit: 21 })).serialize();
   res.json({
     items: items.slice(0, 20),
     next_id: items[20] && items[20].random_id,
