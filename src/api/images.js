@@ -11,19 +11,19 @@ router.post('/scan', async(req, res) => {
 });
 
 router.get('/', async(req, res) => {
-  const { next_id: nextId, is_processed: isProcessed } = req.query;
-  let query = Image.forge().orderBy('random_id', 'asc');
+  const { nextId, isProcessed } = req.query;
+  let query = Image.forge().orderBy('randomId', 'asc');
   if (isProcessed != null) {
-    query = query.where('is_processed', '=',
+    query = query.where('isProcessed', '=',
       ['1', 'true', 'yes'].includes(isProcessed));
   }
   if (nextId != null) {
-    query = query.where('random_id', '<', nextId);
+    query = query.where('randomId', '<', nextId);
   }
   let items = (await query.fetchPage({ limit: 21 })).serialize();
   res.json({
     items: items.slice(0, 20),
-    next_id: items[20] && items[20].random_id,
+    nextId: items[20] && items[20].randomId,
   });
 });
 

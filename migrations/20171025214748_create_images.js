@@ -1,25 +1,26 @@
 exports.up = async knex => {
   await knex.schema.createTable('images', table => {
     table.increments('id').primary();
-    table.integer('random_id').index();
+    table.integer('randomId').index();
     table.string('path').unique();
-    table.boolean('is_processed').index();
-    table.boolean('is_ignored').index();
-    table.timestamps();
-    table.index(['is_processed', 'random_id']);
+    table.boolean('isProcessed').index();
+    table.boolean('isIgnored').index();
+    table.dateTime('createdAt').defaultTo(knex.raw('now()'));
+    table.dateTime('updatedAt').defaultTo(knex.raw('now()'));
+    table.index(['isProcessed', 'randomId']);
   });
   await knex.schema.createTable('images_tags', table => {
     table.increments('id').primary();
-    table.string('image_id').index().references('images.id')
+    table.string('imageId').index().references('images.id')
       .onDelete('cascade').onUpdate('cascade');
-    table.string('tag_id').index().references('tags.id')
+    table.string('tagId').index().references('tags.id')
       .onDelete('cascade').onUpdate('cascade');
-    table.integer('min_x');
-    table.integer('min_y');
-    table.integer('max_x');
-    table.integer('max_y');
-    table.index(['image_id', 'tag_id']);
-    table.index(['tag_id', 'image_id']);
+    table.integer('minX');
+    table.integer('minY');
+    table.integer('maxX');
+    table.integer('maxY');
+    table.index(['imageId', 'tagId']);
+    table.index(['tagId', 'imageId']);
   });
 };
 

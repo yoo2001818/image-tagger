@@ -31,10 +31,10 @@ export default function scan() {
         // Insert to the database
         await knex.from('images').insert(appends.map(path => ({
           path,
-          random_id: Math.random() * 0x7FFFFFFF | 0,
-          is_processed: false,
-          is_ignored: false,
-          created_at: new Date(),
+          randomId: Math.random() * 0x7FFFFFFF | 0,
+          isProcessed: false,
+          isIgnored: false,
+          createdAt: new Date(),
         })));
       }
       // Empty the queue

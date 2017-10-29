@@ -3,16 +3,17 @@ exports.up = async knex => {
     table.increments('id').primary();
     table.string('name').index();
     table.string('color').index();
-    table.boolean('is_global').index();
-    table.timestamps();
+    table.boolean('isGlobal').index();
+    table.dateTime('createdAt').defaultTo(knex.raw('now()'));
+    table.dateTime('updatedAt').defaultTo(knex.raw('now()'));
   });
   await knex.schema.createTable('tags_children', table => {
-    table.string('parent_id').index().references('tags.id')
+    table.string('parentId').index().references('tags.id')
       .onDelete('cascade').onUpdate('cascade');
-    table.string('child_id').index().references('tags.id')
+    table.string('childId').index().references('tags.id')
       .onDelete('cascade').onUpdate('cascade');
-    table.primary(['parent_id', 'child_id']);
-    table.index(['child_id', 'parent_id']);
+    table.primary(['parentId', 'childId']);
+    table.index(['childId', 'parentId']);
   });
 };
 
