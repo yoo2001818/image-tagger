@@ -5,8 +5,8 @@ exports.up = async knex => {
     table.string('path').unique();
     table.boolean('isProcessed').index();
     table.boolean('isIgnored').index();
-    table.dateTime('createdAt').defaultTo(knex.raw('now()'));
-    table.dateTime('updatedAt').defaultTo(knex.raw('now()'));
+    table.dateTime('createdAt').defaultTo(knex.fn.now());
+    table.dateTime('updatedAt').defaultTo(knex.fn.now());
     table.index(['isProcessed', 'randomId']);
   });
   await knex.schema.createTable('images_tags', table => {

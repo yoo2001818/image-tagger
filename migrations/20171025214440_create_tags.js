@@ -4,8 +4,8 @@ exports.up = async knex => {
     table.string('name').index();
     table.string('color').index();
     table.boolean('isGlobal').index();
-    table.dateTime('createdAt').defaultTo(knex.raw('now()'));
-    table.dateTime('updatedAt').defaultTo(knex.raw('now()'));
+    table.dateTime('createdAt').defaultTo(knex.fn.now());
+    table.dateTime('updatedAt').defaultTo(knex.fn.now());
   });
   await knex.schema.createTable('tags_children', table => {
     table.string('parentId').index().references('tags.id')

@@ -1,6 +1,7 @@
 import Router from 'express-promise-router';
 import { NotImplementedError } from './util/errors';
 import scan from './util/scan';
+import cast from './util/cast';
 import { Image } from '../db';
 
 const router = new Router();
@@ -11,15 +12,12 @@ router.post('/scan', async(req, res) => {
 });
 
 router.get('/', async(req, res) => {
-  const { nextId, isProcessed } = req.query;
+  const args = cast({ nextId: 'number', isProcessed: 'boolean' }, req.query);
   let query = Image.forge().orderBy('randomId', 'asc');
-  if (isProcessed != null) {
-    query = query.where('isProcessed', '=',
-      ['1', 'true', 'yes'].includes(isProcessed));
+  if (args.isProcessed != null) {
+    query = query.where('isProcessed', '=', args.isProcessed);
   }
-  if (nextId != null) {
-    query = query.where('randomId', '<', nextId);
-  }
+  if (args.nextId != null) query = query.where('randomId', '<', args.nextId);
   let items = (await query.fetchPage({ limit: 21 })).serialize();
   res.json({
     items: items.slice(0, 20),
@@ -40,22 +38,6 @@ router.get('/:id/tags', (req, res) => {
 });
 
 router.put('/:id/tags', (req, res) => {
-  throw new NotImplementedError();
-});
-
-router.delete('/:id/tags', (req, res) => {
-  throw new NotImplementedError();
-});
-
-router.get('/:id/tags/:tagId', (req, res) => {
-  throw new NotImplementedError();
-});
-
-router.patch('/:id/tags/:tagId', (req, res) => {
-  throw new NotImplementedError();
-});
-
-router.delete('/:id/tags/:tagId', (req, res) => {
   throw new NotImplementedError();
 });
 

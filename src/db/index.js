@@ -16,16 +16,16 @@ export const Tag = bookshelf.Model.extend({
   tableName: 'tags',
   hasTimestamps: true,
   images() {
-    return this.belongsToMany(Image).through(ImageTag);
+    return this.belongsToMany(Image).through(ImageTag, 'tagId', 'imageId');
   },
   imageTags() {
-    return this.hasMany(ImageTag);
+    return this.hasMany(ImageTag, 'tagId');
   },
   parents() {
-    return this.belongsToMany(Tag, 'tags_children', 'child_id', 'parent_id');
+    return this.belongsToMany(Tag, 'tags_children', 'childId', 'parentId');
   },
   children() {
-    return this.belongsToMany(Tag, 'tags_children', 'parent_id', 'child_id');
+    return this.belongsToMany(Tag, 'tags_children', 'parentId', 'childId');
   },
 });
 
@@ -33,19 +33,19 @@ export const Image = bookshelf.Model.extend({
   tableName: 'images',
   hasTimestamps: true,
   tags() {
-    return this.belongsToMany(Tag).through(ImageTag);
+    return this.belongsToMany(Tag).through(ImageTag, 'imageId', 'tagId');
   },
   imageTags() {
-    return this.hasMany(ImageTag);
+    return this.hasMany(ImageTag, 'imageId');
   },
 });
 
 export const ImageTag = bookshelf.Model.extend({
   tableName: 'images_tags',
   tag() {
-    return this.belongsTo(Tag);
+    return this.belongsTo(Tag, 'tagId');
   },
   image() {
-    return this.belongsTo(Image);
+    return this.belongsTo(Image, 'imageId');
   },
 });
