@@ -1,5 +1,5 @@
 import Router from 'express-promise-router';
-import { NotImplementedError } from './util/errors';
+import { NotImplementedError, NotFoundError } from './util/errors';
 import scan from './util/scan';
 import cast from './util/cast';
 import { Image } from '../db';
@@ -18,26 +18,37 @@ router.get('/', async(req, res) => {
     query = query.where('isProcessed', '=', args.isProcessed);
   }
   if (args.nextId != null) query = query.where('randomId', '<', args.nextId);
-  let items = (await query.fetchPage({ limit: 21 })).serialize();
+  let items = (await query.fetchPage({
+    limit: 21, withRelated: ['imageTags', 'imageTags.tag'],
+  })).serialize();
   res.json({
     items: items.slice(0, 20),
     nextId: items[20] && items[20].randomId,
   });
 });
 
-router.get('/:id', (req, res) => {
+router.param('imageId', async(req, res, next, id) => {
+  req.image = await Image.forge({ id })
+    .fetch({ withRelated: ['imageTags', 'imageTags.tag'] });
+  if (req.image == null) {
+    throw new NotFoundError();
+  }
+  next();
+});
+
+router.get('/:imageId', (req, res) => {
+  res.json(req.image);
+});
+
+router.patch('/:imageId', (req, res) => {
   throw new NotImplementedError();
 });
 
-router.patch('/:id', (req, res) => {
+router.get('/:imageId/tags', (req, res) => {
   throw new NotImplementedError();
 });
 
-router.get('/:id/tags', (req, res) => {
-  throw new NotImplementedError();
-});
-
-router.put('/:id/tags', (req, res) => {
+router.put('/:imageId/tags', (req, res) => {
   throw new NotImplementedError();
 });
 

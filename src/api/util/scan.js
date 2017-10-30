@@ -8,6 +8,7 @@ export default function scan() {
     let walker = walk(config.directory, { followLinks: true });
     let queue = [];
     let appendCount = 0;
+    let processCount = 0;
     async function processQueue() {
       // Extract file path
       let paths = queue.map(({ root, stat }) => path.resolve(root, stat.name));
@@ -26,6 +27,7 @@ export default function scan() {
           existingId++;
         }
       }
+      processCount += paths.length;
       appendCount += appends.length;
       if (appends.length > 0) {
         // Insert to the database
@@ -37,6 +39,7 @@ export default function scan() {
           createdAt: new Date(),
         })));
       }
+      console.log('Processed: ' + processCount + ' Added: ' + appendCount);
       // Empty the queue
       queue = [];
     }
