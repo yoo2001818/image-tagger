@@ -12,18 +12,24 @@ router.post('/scan', async(req, res) => {
 });
 
 router.get('/', async(req, res) => {
-  const args = cast({ nextId: 'number', isProcessed: 'boolean' }, req.query);
-  let query = Image.forge().orderBy('randomId', 'asc');
+  const args = cast({
+    nextId: 'number',
+    isProcessed: 'boolean',
+    desc: 'boolean',
+  }, req.query);
+  let query = Image.forge().orderBy('randomId', args.desc ? 'desc' : 'asc');
   if (args.isProcessed != null) {
     query = query.where('isProcessed', '=', args.isProcessed);
   }
-  if (args.nextId != null) query = query.where('randomId', '<', args.nextId);
+  if (args.nextId != null) {
+    query = query.where('randomId', args.desc ? '>' : '<', args.nextId);
+  }
   let items = (await query.fetchPage({
-    limit: 21, withRelated: ['imageTags', 'imageTags.tag'],
+    limit: 20, withRelated: ['imageTags', 'imageTags.tag'],
   })).serialize();
   res.json({
-    items: items.slice(0, 20),
-    nextId: items[20] && items[20].randomId,
+    items: items,
+    nextId: items[19] && items[19].randomId,
   });
 });
 
