@@ -1,5 +1,5 @@
 import Router from 'express-promise-router';
-import { NotImplementedError } from './util/errors';
+import { NotImplementedError, NotFoundError } from './util/errors';
 import cast from './util/cast';
 import pick from './util/pick';
 import { Tag } from '../db';
@@ -43,15 +43,24 @@ router.post('/', async(req, res) => {
   res.json(tag.serialize({ omitPivot: true }));
 });
 
-router.get('/:id', (req, res) => {
+router.param('tagId', async(req, res, next, id) => {
+  req.tag = await Tag.forge({ id })
+    .fetch({ withRelated: ['children', 'parents'] });
+  if (req.tag == null) {
+    throw new NotFoundError();
+  }
+  next();
+});
+
+router.get('/:tagId', (req, res) => {
+  res.json(req.tag.serialize({ omitPivot: true }));
+});
+
+router.patch('/:tagId', (req, res) => {
   throw new NotImplementedError();
 });
 
-router.patch('/:id', (req, res) => {
-  throw new NotImplementedError();
-});
-
-router.delete('/:id', (req, res) => {
+router.delete('/:tagId', (req, res) => {
   throw new NotImplementedError();
 });
 
