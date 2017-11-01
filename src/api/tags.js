@@ -1,5 +1,5 @@
 import Router from 'express-promise-router';
-import { NotImplementedError, NotFoundError } from './util/errors';
+import { NotFoundError } from './util/errors';
 import cast from './util/cast';
 import pick from './util/pick';
 import { Tag } from '../db';
@@ -56,12 +56,15 @@ router.get('/:tagId', (req, res) => {
   res.json(req.tag.serialize({ omitPivot: true }));
 });
 
-router.patch('/:tagId', (req, res) => {
-  throw new NotImplementedError();
+router.patch('/:tagId', async(req, res) => {
+  let body = pick(['name', 'color', 'isGlobal'], req.body);
+  await req.tag.save(body);
+  res.json(req.tag.serialize({ omitPivot: true }));
 });
 
-router.delete('/:tagId', (req, res) => {
-  throw new NotImplementedError();
+router.delete('/:tagId', async(req, res) => {
+  await req.tag.destroy();
+  res.json({});
 });
 
 export default router;
