@@ -33,8 +33,10 @@ router.post('/', async(req, res) => {
   let tag = new Tag(body);
   await tag.save();
   // If children, parents is set, apply them.
+  // TODO Check if parents is array
   if (req.body.parents) {
-    await tag.related('parents').attach(req.body.parents);
+    await tag.related('parents').attach(
+      req.body.parents.map(id => ({ parent_id: id, derivedCount: -1 })));
     // Attach all parents' parents to the children itself; This should be done
     // using raw knex query.
     await knex('tags_children').insert(function() {
@@ -46,7 +48,14 @@ router.post('/', async(req, res) => {
     });
   }
   if (req.body.children) {
-    await tag.related('children').attach(req.body.children);
+    await tag.related('children').attach(
+      req.body.children.map(id => ({ child_id: id, derivedCount: -1 })));
+    // Attach all the tag's parents to the children. This should be done in
+    // the following order:
+    // 1. Join all parents of the tag and the children list - this can be done
+    //    SQL, or JS side.
+    // 2. Insert them, and increase derivedCount if the derivedCount is 0 when
+    //    it conflicts.
   }
   await tag.load(['children', 'parents']);
   res.json(tag.serialize({ omitPivot: true }));
