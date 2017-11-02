@@ -2,7 +2,7 @@ import Router from 'express-promise-router';
 import { NotFoundError } from './util/errors';
 import cast from './util/cast';
 import pick from './util/pick';
-import { Tag } from '../db';
+import { knex, Tag } from '../db';
 
 const router = new Router();
 
@@ -33,11 +33,20 @@ router.post('/', async(req, res) => {
   let tag = new Tag(body);
   await tag.save();
   // If children, parents is set, apply them.
-  if (req.body.children) {
-    await tag.related('children').attach(req.body.children);
-  }
   if (req.body.parents) {
     await tag.related('parents').attach(req.body.parents);
+    // Attach all parents' parents to the children itself; This should be done
+    // using raw knex query.
+    await knex('tags_children').insert(function() {
+      return this.from('tags_children AS c')
+        .whereIn('c.childId', req.body.parents)
+        .groupBy('c.parentId')
+        .select('c.parentId AS parentId', knex.raw('? AS childId', tag.id))
+        .countDistinct('c.childId as derivedCount');
+    });
+  }
+  if (req.body.children) {
+    await tag.related('children').attach(req.body.children);
   }
   await tag.load(['children', 'parents']);
   res.json(tag.serialize({ omitPivot: true }));

@@ -12,6 +12,7 @@ exports.up = async knex => {
       .onDelete('cascade').onUpdate('cascade');
     table.string('childId').index().references('tags.id')
       .onDelete('cascade').onUpdate('cascade');
+    table.integer('derivedCount').index();
     table.primary(['parentId', 'childId']);
     table.index(['childId', 'parentId']);
   });
