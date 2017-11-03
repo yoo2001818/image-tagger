@@ -56,6 +56,39 @@ router.post('/', async(req, res) => {
     //    SQL, or JS side.
     // 2. Insert them, and increase derivedCount if the derivedCount is 0 when
     //    it conflicts.
+    // Three implementations are possible:
+    // - Use UPSERT query. However, this isn't supported in all databases.
+    // - Run UPDATE with inner join, then INSERT with left exclusive join.
+    // - Get all list with left join first, then separate two queries.
+    // First one is fastest, but should be avoid due to compatibility.
+    // Second one runs join twice. If the database is large enough, this can be
+    // a problem.
+    // Third one requires transmitting data from/to the server, twice. This can
+    // be expensive if the network bandwidth is small.
+    // Let's implement second one - however, it's not possible to update the
+    // rows using it because it uses compound priamry key.
+    // So let's execute the query for each children.
+    for (let childId of tag.body.children) {
+      await knex('tags_children').increment('derivedCount', 1)
+        .whereIn('parentId', function() {
+          return this.from('tags_children AS p')
+            .where('p.childId', '=', tag.id)
+            .select('p.parentId');
+        })
+        .andWhere('childId', '=', childId)
+        .andWhere('derivedCount', '!=', -1);
+      await knex('tags_children').insert(function() {
+        return this.from('tags_children AS p')
+          .where('p.childId', '=', tag.id)
+          .leftJoin('tags_children AS c', function() {
+            return this.on('c.parentId', '=', 'p.parentId')
+              .andOn('c.childId', '=', childId);
+          })
+          .whereNull('c.childId')
+          .select('p.parentId AS parentId', knex.raw('? AS childId', childId),
+            knex.raw('1 AS derivedCount'));
+      });
+    }
   }
   await tag.load(['children', 'parents']);
   res.json(tag.serialize({ omitPivot: true }));
