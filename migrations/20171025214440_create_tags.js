@@ -1,7 +1,7 @@
 exports.up = async knex => {
   await knex.schema.createTable('tags', table => {
     table.increments('id').primary();
-    table.string('name').index().required();
+    table.string('name').index().notNull();
     table.string('color').index();
     table.boolean('isGlobal').index();
     table.dateTime('createdAt').defaultTo(knex.fn.now());

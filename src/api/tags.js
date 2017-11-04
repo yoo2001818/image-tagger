@@ -36,7 +36,7 @@ router.post('/', async(req, res) => {
   // TODO Check if parents is array
   if (req.body.parents) {
     await tag.related('parents').attach(
-      req.body.parents.map(id => ({ parent_id: id, derivedCount: -1 })));
+      req.body.parents.map(id => ({ parentId: id, derivedCount: -1 })));
     // Attach all parents' parents to the children itself; This should be done
     // using raw knex query.
     await knex('tags_children').insert(function() {
@@ -48,8 +48,19 @@ router.post('/', async(req, res) => {
     });
   }
   if (req.body.children) {
+    // For each link, we do these following steps:
+    // 1. Add direct link to parent -> child.
+    // 2. Propagate link to parents.
+    // 3. Propagate children's links to parents.
     await tag.related('children').attach(
-      req.body.children.map(id => ({ child_id: id, derivedCount: -1 })));
+      req.body.children.map(id => ({ childId: id, derivedCount: -1 })));
+    // For each child, we create these queries' results:
+    //   SELECT parentId, ? AS childId FROM tags_children
+    //   WHERE childId = ?;
+    //   SELECT p.parentId, c.childId
+    //   FROM (SELECT * FROM tags_children WHERE childId = ?) p,
+    //     (SELECT * FROM tags_children WHERE parentId = ?) c;
+    //
     // Attach all the tag's parents to the children. This should be done in
     // the following order:
     // 1. Join all parents of the tag and the children list - this can be done
@@ -68,7 +79,7 @@ router.post('/', async(req, res) => {
     // Let's implement second one - however, it's not possible to update the
     // rows using it because it uses compound priamry key.
     // So let's execute the query for each children.
-    for (let childId of tag.body.children) {
+    for (let childId of req.body.children) {
       await knex('tags_children').increment('derivedCount', 1)
         .whereIn('parentId', function() {
           return this.from('tags_children AS p')
