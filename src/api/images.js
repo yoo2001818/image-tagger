@@ -1,8 +1,9 @@
 import Router from 'express-promise-router';
-import { NotImplementedError, NotFoundError } from './util/errors';
+import { NotFoundError } from './util/errors';
 import scan from './util/scan';
 import cast from './util/cast';
-import { Image } from '../db';
+import pick from './util/pick';
+import { knex, Image } from '../db';
 
 const router = new Router();
 
@@ -46,16 +47,20 @@ router.get('/:imageId', (req, res) => {
   res.json(req.image);
 });
 
-router.patch('/:imageId', (req, res) => {
-  throw new NotImplementedError();
-});
-
-router.get('/:imageId/tags', (req, res) => {
-  throw new NotImplementedError();
-});
-
-router.put('/:imageId/tags', (req, res) => {
-  throw new NotImplementedError();
+router.patch('/:imageId', async(req, res) => {
+  // Tags are provided with id, xMin, xMax, yMin, yMax.
+  // Since this request is a bulk request, completely overwrite the values when
+  // the imageTags is provided.
+  let body = cast({ isProcessed: 'boolean', isIgnored: 'boolean' }, req.body);
+  await req.image.save(body);
+  if (req.body.imageTags) {
+    await knex('images_tags').where('imageId', req.image.id).del();
+    await knex('images_tags').insert(req.body.imageTags.map(v =>
+      Object.assign({}, pick(['tagId', 'minX', 'maxX', 'minY', 'maxY'], v),
+        { imageId: req.image.id })));
+    await req.image.load(['imageTags', 'imageTags.tag']);
+  }
+  res.json(req.image);
 });
 
 export default router;

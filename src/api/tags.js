@@ -2,7 +2,7 @@ import Router from 'express-promise-router';
 import { NotFoundError } from './util/errors';
 import cast from './util/cast';
 import pick from './util/pick';
-import { knex, Tag } from '../db';
+import { Tag } from '../db';
 
 const router = new Router();
 
@@ -36,70 +36,11 @@ router.post('/', async(req, res) => {
   // TODO Check if parents is array
   if (req.body.parents) {
     await tag.related('parents').attach(
-      req.body.parents.map(id => ({ parentId: id, derivedCount: -1 })));
-    // Attach all parents' parents to the children itself; This should be done
-    // using raw knex query.
-    await knex('tags_children').insert(function() {
-      return this.from('tags_children AS c')
-        .whereIn('c.childId', req.body.parents)
-        .groupBy('c.parentId')
-        .select('c.parentId AS parentId', knex.raw('? AS childId', tag.id))
-        .countDistinct('c.childId as derivedCount');
-    });
+      req.body.parents.map(id => ({ parentId: id })));
   }
   if (req.body.children) {
-    // For each link, we do these following steps:
-    // 1. Add direct link to parent -> child.
-    // 2. Propagate link to parents.
-    // 3. Propagate children's links to parents.
     await tag.related('children').attach(
-      req.body.children.map(id => ({ childId: id, derivedCount: -1 })));
-    // For each child, we create these queries' results:
-    //   SELECT parentId, ? AS childId FROM tags_children
-    //   WHERE childId = ?;
-    //   SELECT p.parentId, c.childId
-    //   FROM (SELECT * FROM tags_children WHERE childId = ?) p,
-    //     (SELECT * FROM tags_children WHERE parentId = ?) c;
-    //
-    // Attach all the tag's parents to the children. This should be done in
-    // the following order:
-    // 1. Join all parents of the tag and the children list - this can be done
-    //    SQL, or JS side.
-    // 2. Insert them, and increase derivedCount if the derivedCount is 0 when
-    //    it conflicts.
-    // Three implementations are possible:
-    // - Use UPSERT query. However, this isn't supported in all databases.
-    // - Run UPDATE with inner join, then INSERT with left exclusive join.
-    // - Get all list with left join first, then separate two queries.
-    // First one is fastest, but should be avoid due to compatibility.
-    // Second one runs join twice. If the database is large enough, this can be
-    // a problem.
-    // Third one requires transmitting data from/to the server, twice. This can
-    // be expensive if the network bandwidth is small.
-    // Let's implement second one - however, it's not possible to update the
-    // rows using it because it uses compound priamry key.
-    // So let's execute the query for each children.
-    for (let childId of req.body.children) {
-      await knex('tags_children').increment('derivedCount', 1)
-        .whereIn('parentId', function() {
-          return this.from('tags_children AS p')
-            .where('p.childId', '=', tag.id)
-            .select('p.parentId');
-        })
-        .andWhere('childId', '=', childId)
-        .andWhere('derivedCount', '!=', -1);
-      await knex('tags_children').insert(function() {
-        return this.from('tags_children AS p')
-          .where('p.childId', '=', tag.id)
-          .leftJoin('tags_children AS c', function() {
-            return this.on('c.parentId', '=', 'p.parentId')
-              .andOn('c.childId', '=', childId);
-          })
-          .whereNull('c.childId')
-          .select('p.parentId AS parentId', knex.raw('? AS childId', childId),
-            knex.raw('1 AS derivedCount'));
-      });
-    }
+      req.body.children.map(id => ({ childId: id })));
   }
   await tag.load(['children', 'parents']);
   res.json(tag.serialize({ omitPivot: true }));
@@ -121,6 +62,18 @@ router.get('/:tagId', (req, res) => {
 router.patch('/:tagId', async(req, res) => {
   let body = pick(['name', 'color', 'isGlobal'], req.body);
   await req.tag.save(body);
+  if (req.body.parents) {
+    await req.tag.related('parents').detach();
+    await req.tag.related('parents').attach(
+      req.body.parents.map(id => ({ parentId: id })));
+    await req.tag.load(['parents']);
+  }
+  if (req.body.children) {
+    await req.tag.related('children').detach();
+    await req.tag.related('children').attach(
+      req.body.children.map(id => ({ childId: id })));
+    await req.tag.load(['children']);
+  }
   res.json(req.tag.serialize({ omitPivot: true }));
 });
 
