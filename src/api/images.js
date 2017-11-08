@@ -23,7 +23,7 @@ router.get('/', async(req, res) => {
     query = query.where('isProcessed', '=', args.isProcessed);
   }
   if (args.nextId != null) {
-    query = query.where('randomId', args.desc ? '>' : '<', args.nextId);
+    query = query.where('randomId', args.desc ? '<' : '>', args.nextId);
   }
   let items = (await query.fetchPage({
     limit: 20, withRelated: ['imageTags', 'imageTags.tag'],

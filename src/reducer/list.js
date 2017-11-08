@@ -4,10 +4,10 @@ export default function listReducer(state = {}, action) {
   return Object.assign({}, state, {
     [name]: Object.assign({}, state[name], (() => {
       if (action.meta.pending) {
-        const { filter, next } = action.payload;
+        const { filter, nextId } = action.payload;
         return {
           pending: true,
-          items: next == null ? [] : state[name].items,
+          items: nextId == null ? [] : state[name].items,
           filter: filter,
         };
       } else {
@@ -18,11 +18,11 @@ export default function listReducer(state = {}, action) {
           };
           */
         } else {
-          const { items, hasNext, nextId } = action.payload;
+          const { items, nextId } = action.payload;
           return {
             pending: false,
             nextId,
-            hasNext,
+            hasNext: nextId != null,
             items: ((state[name] || {}).items || []).concat(items),
           };
         }
@@ -49,10 +49,10 @@ export function normalizeListReducer(state = {
       [name]: Object.assign({}, lists[name], (() => {
         const list = lists[name] || {};
         if (action.meta.pending) {
-          const { filter, next } = action.payload;
+          const { filter, nextId } = action.payload;
           return {
             pending: true,
-            refresh: next == null,
+            refresh: nextId == null,
             items: list.items || [],
             filter: filter,
           };
@@ -65,11 +65,11 @@ export function normalizeListReducer(state = {
             */
             return {};
           } else {
-            const { items, hasNext, nextId } = action.payload;
+            const { items, nextId } = action.payload;
             return {
               pending: false,
               nextId,
-              hasNext,
+              hasNext: nextId != null,
               refresh: false,
               items: (list.refresh ? [] : (list.items || []))
                 .concat(items.map(getKey)),

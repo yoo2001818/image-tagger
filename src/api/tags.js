@@ -17,7 +17,7 @@ router.get('/', async(req, res) => {
     query = query.where('name', 'LIKE', args.name);
   }
   if (args.nextId != null) {
-    query = query.where('id', args.desc ? '>' : '<', args.nextId);
+    query = query.where('id', args.desc ? '<' : '>', args.nextId);
   }
   let items = (await query.fetchPage({
     limit: 20, withRelated: ['parents'],

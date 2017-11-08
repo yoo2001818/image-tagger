@@ -10,12 +10,12 @@ export const DESTROY = 'image/destroy';
 export const POST = 'image/post';
 
 export const fetchList = createAction(FETCH_LIST,
-  (name, filter, next) => ({ name, filter, next }),
-  (name, filter, next) => ({
+  (name, filter, nextId) => ({ name, filter, nextId }),
+  (name, filter, nextId) => ({
     name,
     filter,
     api: api('GET', '/images',
-      { query: Object.assign({}, filter, { nextId: next }) }),
+      { query: Object.assign({}, filter, { nextId }) }),
   }));
 
 export const fetch = createAction(FETCH,

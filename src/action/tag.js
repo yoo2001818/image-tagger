@@ -10,12 +10,12 @@ export const DESTROY = 'tag/destroy';
 export const POST = 'tag/post';
 
 export const fetchList = createAction(FETCH_LIST,
-  (name, filter, next) => ({ name, filter, next }),
-  (name, filter, next) => ({
+  (name, filter, nextId) => ({ name, filter, nextId }),
+  (name, filter, nextId) => ({
     name,
     filter,
     api: api('GET', '/tags',
-      { query: Object.assign({}, filter, { nextId: next }) }),
+      { query: Object.assign({}, filter, { nextId }) }),
   }));
 
 export const fetch = createAction(FETCH,
