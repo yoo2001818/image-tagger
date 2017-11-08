@@ -1,0 +1,23 @@
+.image-list {
+  display: block;
+  & > .list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    & > .image {
+      display: inline-block;
+      width: 20em;
+      margin: 0.2em;
+      & > img {
+        width: 100%;
+      }
+      & > .path {
+        width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+}

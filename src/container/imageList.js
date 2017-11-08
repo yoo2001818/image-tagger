@@ -17,7 +17,8 @@ class ImageList extends Component {
     console.log(list);
     return (
       <InfiniteScroll className='image-list' hasMore={list.hasNext}
-        initialLoad={false} loadMore={this.handleLoad.bind(this)}>
+        loadMore={this.handleLoad.bind(this)}
+      >
         <ul className='list'>
           { items.map((v, i) => (
             <li className='image' key={i}>
