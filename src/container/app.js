@@ -6,9 +6,14 @@ export default class App extends Component {
   render() {
     return (
       <div id='app'>
-        <h1>Hello, world!</h1>
-        <TagList />
-        <ImageList />
+        <div className='content'>
+          <ImageList />
+        </div>
+        <div className='sidebar'>
+          <div className='content'>
+            <TagList />
+          </div>
+        </div>
       </div>
     );
   }
