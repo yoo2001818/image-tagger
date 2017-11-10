@@ -4,7 +4,7 @@ import serveStatic from 'serve-static';
 import compression from 'compression';
 import morgan from 'morgan';
 
-import config, { network as networkConfig } from '../config';
+import { network as networkConfig } from '../config';
 import api from './api';
 
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
@@ -15,8 +15,6 @@ const app = express();
 
 app.use(morgan('dev'));
 app.use('/api', api);
-
-app.use('/imageFiles', serveStatic(config.directory));
 
 if (IS_PRODUCTION) {
   app.use(compression());

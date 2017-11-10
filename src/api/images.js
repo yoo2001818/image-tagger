@@ -1,9 +1,12 @@
 import Router from 'express-promise-router';
+import path from 'path';
 import { NotFoundError } from './util/errors';
 import scan from './util/scan';
 import cast from './util/cast';
 import pick from './util/pick';
 import { knex, Image } from '../db';
+
+import config from '../config';
 
 const router = new Router();
 
@@ -45,6 +48,10 @@ router.param('imageId', async(req, res, next, id) => {
 
 router.get('/:imageId', (req, res) => {
   res.json(req.image);
+});
+
+router.get('/:imageId/raw', (req, res) => {
+  res.sendFile(path.resolve(config.directory, path.normalize(req.image.path)));
 });
 
 router.patch('/:imageId', async(req, res) => {
