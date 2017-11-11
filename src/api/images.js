@@ -4,9 +4,10 @@ import { NotFoundError } from './util/errors';
 import scan from './util/scan';
 import cast from './util/cast';
 import pick from './util/pick';
+import thumbnail from './util/thumbnail';
 import { knex, Image } from '../db';
 
-import config from '../config';
+import config from '../../config';
 
 const router = new Router();
 
@@ -50,8 +51,13 @@ router.get('/:imageId', (req, res) => {
   res.json(req.image);
 });
 
+router.get('/:imageId/thumb', async(req, res) => {
+  res.sendFile(await thumbnail(path.normalize(req.image.get('path'))));
+});
+
 router.get('/:imageId/raw', (req, res) => {
-  res.sendFile(path.resolve(config.directory, path.normalize(req.image.path)));
+  res.sendFile(path.resolve(config.directory,
+    path.normalize(req.image.get('path'))));
 });
 
 router.patch('/:imageId', async(req, res) => {

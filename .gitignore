@@ -59,6 +59,7 @@ typings/
 
 dist/
 lib/
+thumbs/
 config/db.js
 config/index.js
 dev.sqlite3

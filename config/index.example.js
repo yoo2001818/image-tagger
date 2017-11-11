@@ -5,4 +5,5 @@ module.exports = {
     host: '0.0.0.0',
   },
   directory: path.resolve(__dirname, '..', 'photos'),
+  thumbDirectory: path.resolve(__dirname, '..', 'thumbs'),
 };

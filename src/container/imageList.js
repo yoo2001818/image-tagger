@@ -22,7 +22,7 @@ class ImageList extends Component {
         <ul className='list'>
           { items.map((v, i) => (
             <li className='image' key={i}>
-              <img src={`/imageFiles/${v.path}`} width={320} />
+              <img src={`/api/images/${v.id}/thumb`} width={320} height={180} />
               <div className='path'>{ v.path }</div>
             </li>
           )) }
