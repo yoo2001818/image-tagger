@@ -4,3 +4,4 @@ export function test(action, state = {}) {
 
 export { default as tag } from './tag';
 export { default as image } from './image';
+export { default as entities } from './entities';

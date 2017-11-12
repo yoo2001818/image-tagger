@@ -2,6 +2,7 @@ import { createStore, applyMiddleware, combineReducers } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import { createLogger } from 'redux-logger';
 import apiMiddleware from './api';
+import normalizeMiddleware from './normalize';
 
 let reducers = require('../reducer');
 
@@ -16,6 +17,7 @@ export default function configureStore(initialState) {
   let middlewares = applyMiddleware(
     thunkMiddleware,
     apiMiddleware,
+    normalizeMiddleware,
     logger,
   );
   const store = middlewares(createStore)(reducer, initialState);
