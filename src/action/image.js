@@ -6,6 +6,10 @@ import api from './api';
 export const FETCH_LIST = 'image/fetchList';
 export const FETCH = 'image/fetch';
 export const PATCH = 'image/patch';
+export const SET = 'image/set';
+export const ADD_TAG = 'image/addTag';
+export const REMOVE_TAG = 'image/removeTag';
+export const SET_TAG = 'image/setTag';
 export const DESTROY = 'image/destroy';
 export const POST = 'image/post';
 
@@ -16,6 +20,7 @@ export const fetchList = createAction(FETCH_LIST,
     filter,
     api: api('GET', '/images',
       { query: Object.assign({}, filter, { nextId }) }),
+    schema: { items: ['image'] },
   }));
 
 export const fetch = createAction(FETCH,
@@ -23,8 +28,26 @@ export const fetch = createAction(FETCH,
   id => ({ id, api: api('GET', `/images/${id}`) }));
 
 export const patch = createAction(PATCH,
-  (id, data) => ({ id, data }),
-  (id, data) => ({ id, api: api('PATCH', `/images/${id}`, { body: data }) }));
+  (id, data) => ({ id }),
+  (id, data) => ({
+    id, api: api('PATCH', `/images/${id}`, { body: data }),
+  }));
+
+export const set = createAction(SET,
+  (id, data) => ({ data }),
+  (id, data) => ({ id }));
+
+export const addTag = createAction(ADD_TAG,
+  (id, data) => ({ data }),
+  (id) => ({ id }));
+
+export const removeTag = createAction(REMOVE_TAG,
+  (id, tagId) => ({ tagId }),
+  (id, tagId) => ({ id, tagId }));
+
+export const setTag = createAction(SET_TAG,
+  (id, tagId, data) => ({ tagId, data }),
+  (id, tagId) => ({ id, tagId }));
 
 export function loadList(name, filter, reset) {
   return (dispatch, getState) => {
@@ -36,8 +59,16 @@ export function loadList(name, filter, reset) {
 
 export function load(id) {
   return (dispatch, getState) => {
-    let { entities } = getState().image;
-    if (entities[id] == null) return dispatch(fetch(id));
+    let { images } = getState().entities;
+    if (images[id] == null) return dispatch(fetch(id));
+    return Promise.resolve();
+  };
+}
+
+export function save(id) {
+  return (dispatch, getState) => {
+    let { images } = getState().entities;
+    if (images[id].dirty) return dispatch(patch(id, images[id]));
     return Promise.resolve();
   };
 }

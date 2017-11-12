@@ -1,5 +1,6 @@
 import { normalizeListReducer } from './list';
-import { FETCH_LIST, FETCH, PATCH } from '../action/image';
+import { FETCH_LIST, FETCH, PATCH,
+  SET, ADD_TAG, REMOVE_TAG, SET_TAG } from '../action/image';
 
 export default function imageReducer(state = {
   lists: {},
@@ -12,6 +13,10 @@ export default function imageReducer(state = {
       return normalizeListReducer(state, action, v => v.id);
     case FETCH:
     case PATCH:
+    case SET:
+    case ADD_TAG:
+    case REMOVE_TAG:
+    case SET_TAG:
       return Object.assign({}, state, {
         entities: Object.assign({}, entities, {
           [id]: imageEntryReducer(entities[id], action),
@@ -30,6 +35,7 @@ export function imageEntryReducer(state = {}, action) {
         return Object.assign({}, state, { notExists: true });
       }
       if (action.error || action.meta.pending) return state;
-      return Object.assign({}, state, action.payload, { pending: false });
+      return Object.assign({}, state, action.payload, {
+        pending: false, dirty: false });
   }
 }
