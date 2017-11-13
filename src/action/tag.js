@@ -22,11 +22,15 @@ export const fetchList = createAction(FETCH_LIST,
 
 export const fetch = createAction(FETCH,
   id => ({ id }),
-  id => ({ id, api: api('GET', `/tags/${id}`) }));
+  id => ({ id, api: api('GET', `/tags/${id}`), schema: 'tag' }));
 
 export const patch = createAction(PATCH,
   (id, data) => ({ id, data }),
-  (id, data) => ({ id, api: api('PATCH', `/tags/${id}`, { body: data }) }));
+  (id, data) => ({
+    id,
+    api: api('PATCH', `/tags/${id}`, { body: data }),
+    schema: 'tag',
+  }));
 
 export const set = createAction(SET,
   (id, data) => ({ id, data }),
@@ -34,11 +38,11 @@ export const set = createAction(SET,
 
 export const destroy = createAction(DESTROY,
   id => ({ id }),
-  id => ({ id, api: api('DELETE', `/tags/${id}`) }));
+  id => ({ id, api: api('DELETE', `/tags/${id}`), schema: 'tag' }));
 
 export const post = createAction(POST,
   (data) => ({ data }),
-  (data) => ({ api: api('POST', '/tags', { body: data }) }));
+  (data) => ({ api: api('POST', '/tags', { body: data }), schema: 'tag' }));
 
 export function loadList(name, filter, reset) {
   return (dispatch, getState) => {

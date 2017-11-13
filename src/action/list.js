@@ -1,7 +1,7 @@
 import isEqual from 'lodash.isequal';
 
 export function genLoadList(state, name, filter, reset, fetchList) {
-  let entry = ((state && state.lists) || {})[name];
+  let entry = (state || {})[name];
   let loadNew = false;
   if (entry != null) {
     if (reset) loadNew = true;

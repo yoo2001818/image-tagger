@@ -19,7 +19,7 @@ function unwrapSchema(data) {
 export const normalizeMiddleware = store => next => action => {
   if (action == null) return next(action);
   if (action.meta == null || action.meta.schema == null) return next(action);
-  if (action.error || (action.meta && action.meta.pending)) return next(action);
+  if (action.error || action.meta.pending) return next(action);
   let schemaData = unwrapSchema(action.meta.schema);
   return next(Object.assign({}, action, {
     payload: normalize(action.payload, schemaData),

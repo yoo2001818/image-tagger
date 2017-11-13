@@ -14,7 +14,6 @@ class ImageList extends Component {
   render() {
     const { list = {}, entities } = this.props;
     const items = ((list || {}).items || []).map(v => entities[v]);
-    console.log(list);
     return (
       <InfiniteScroll className='image-list' hasMore={list.hasNext}
         loadMore={this.handleLoad.bind(this)}
@@ -33,7 +32,7 @@ class ImageList extends Component {
 }
 
 export default connect(
-  ({ image }) => ({ list: image.lists.main, entities: image.entities }),
+  state => ({ list: state.image.main, entities: state.entities.image }),
   { loadList, patch, destroy, post },
 )(ImageList);
 

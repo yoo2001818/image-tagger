@@ -14,7 +14,6 @@ class TagList extends Component {
   render() {
     const { list = {}, entities } = this.props;
     const items = ((list || {}).items || []).map(v => entities[v]);
-    console.log(list);
     return (
       <InfiniteScroll className='tag-list' hasMore={list.hasNext}
         loadMore={this.handleLoad.bind(this)}
@@ -32,7 +31,7 @@ class TagList extends Component {
 }
 
 export default connect(
-  ({ tag }) => ({ list: tag.lists.main, entities: tag.entities }),
+  state => ({ list: state.tag.main, entities: state.entities.tag }),
   { loadList, patch, destroy, post },
 )(TagList);
 

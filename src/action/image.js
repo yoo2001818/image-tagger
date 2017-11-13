@@ -25,12 +25,14 @@ export const fetchList = createAction(FETCH_LIST,
 
 export const fetch = createAction(FETCH,
   id => ({ id }),
-  id => ({ id, api: api('GET', `/images/${id}`) }));
+  id => ({ id, api: api('GET', `/images/${id}`), schema: 'image' }));
 
 export const patch = createAction(PATCH,
   (id, data) => ({ id }),
   (id, data) => ({
-    id, api: api('PATCH', `/images/${id}`, { body: data }),
+    id,
+    api: api('PATCH', `/images/${id}`, { body: data }),
+    schema: 'image',
   }));
 
 export const set = createAction(SET,
