@@ -11,7 +11,7 @@ export const ADD_TAG = 'image/addTag';
 export const REMOVE_TAG = 'image/removeTag';
 export const SET_TAG = 'image/setTag';
 export const DESTROY = 'image/destroy';
-export const POST = 'image/post';
+export const SCAN = 'image/scan';
 
 export const fetchList = createAction(FETCH_LIST,
   (name, filter, nextId) => ({ name, filter, nextId }),
@@ -50,6 +50,10 @@ export const removeTag = createAction(REMOVE_TAG,
 export const setTag = createAction(SET_TAG,
   (id, tagId, data) => ({ tagId, data }),
   (id, tagId) => ({ id, tagId }));
+
+export const scan = createAction(SCAN,
+  () => {},
+  () => ({ api: api('POST', '/images/scan') }));
 
 export function loadList(name, filter, reset) {
   return (dispatch, getState) => {
