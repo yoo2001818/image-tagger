@@ -1,34 +1,8 @@
-import mergeEntities from '../../util/mergeEntities';
+import createEntitiesReducer from './entities';
 import { FETCH, PATCH, SET, ADD_TAG, REMOVE_TAG, SET_TAG, DESTROY }
   from '../../action/image';
 
-export default function imageEntityReducer(state = {}, action) {
-  // First, merge entities.
-  let newState = mergeEntities(state, action, 'image');
-  // Then, run image reducer.
-  if (action.meta.id == null) return newState;
-  // When the object is null, we have to be sure if the reducer actually
-  // processes the action. To do that, we run reducer twice.
-  let result;
-  if (newState[action.meta.id] == null) {
-    let initialState = imageReducer(undefined, { type: '@@redux/init' });
-    result = imageReducer(initialState, action);
-    if (result === initialState) return newState;
-  } else {
-    result = imageReducer(newState[action.meta.id], action);
-    if (result === newState[action.meta.id]) return newState;
-    if (result === null) {
-      let output = Object.assign({}, newState);
-      delete output[action.meta.id];
-      return output;
-    }
-  }
-  return Object.assign({}, newState, {
-    [action.meta.id]: result,
-  });
-}
-
-export function imageReducer(state = {
+export function imageEntityReducer(state = {
   imageTags: [],
 }, action) {
   switch (action.type) {
@@ -57,14 +31,16 @@ export function imageReducer(state = {
       });
     case REMOVE_TAG:
       return Object.assign({}, state, {
-        imageTags: state.imageTags.filter((_, i) => i !== action.id),
+        imageTags: state.imageTags.filter((_, i) => i !== action.payload.tagId),
       });
     case SET_TAG:
       return Object.assign({}, state, {
         imageTags: state.imageTags.map(
-          (v, i) => i === action.id ? action.payload.data : v),
+          (v, i) => i === action.payload.tagId ? action.payload.data : v),
       });
     default:
       return state;
   }
 }
+
+export default createEntitiesReducer('images', imageEntityReducer);
