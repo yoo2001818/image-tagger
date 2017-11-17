@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import InfiniteScroll from 'react-infinite-scroller';
 
+import TagItem from './tagItem';
+
 import { loadList, patch, destroy, post } from '../action/tag';
 
 class TagList extends Component {
@@ -12,16 +14,16 @@ class TagList extends Component {
     this.props.loadList('main', {});
   }
   render() {
-    const { list = {}, entities } = this.props;
-    const items = ((list || {}).items || []).map(v => entities[v]);
+    const { list = {} } = this.props;
+    const items = list.items || [];
     return (
       <InfiniteScroll className='tag-list' hasMore={list.hasNext}
         loadMore={this.handleLoad.bind(this)}
       >
         <ul className='list'>
-          { items.map((v, i) => (
-            <li className='tag' key={i}>
-              <div className='name'>{ v.name }</div>
+          { items.map((v) => (
+            <li className='tag' key={v}>
+              <TagItem id={v} />
             </li>
           )) }
         </ul>
@@ -31,7 +33,7 @@ class TagList extends Component {
 }
 
 export default connect(
-  state => ({ list: state.tag.main, entities: state.entities.tag }),
+  state => ({ list: state.tag.main }),
   { loadList, patch, destroy, post },
 )(TagList);
 

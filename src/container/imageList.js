@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import InfiniteScroll from 'react-infinite-scroller';
 
+import ImageItem from './imageItem';
+
 import { loadList, patch, destroy, post } from '../action/image';
 
 class ImageList extends Component {
@@ -12,17 +14,16 @@ class ImageList extends Component {
     this.props.loadList('main', {});
   }
   render() {
-    const { list = {}, entities } = this.props;
-    const items = ((list || {}).items || []).map(v => entities[v]);
+    const { list = {} } = this.props;
+    const items = list.items || [];
     return (
       <InfiniteScroll className='image-list' hasMore={list.hasNext}
         loadMore={this.handleLoad.bind(this)}
       >
         <ul className='list'>
-          { items.map((v, i) => (
-            <li className='image' key={i}>
-              <img src={`/api/images/${v.id}/thumb`} width={320} height={180} />
-              <div className='path'>{ v.path }</div>
+          { items.map(id => (
+            <li className='image' key={id}>
+              <ImageItem id={id} />
             </li>
           )) }
         </ul>
@@ -32,7 +33,7 @@ class ImageList extends Component {
 }
 
 export default connect(
-  state => ({ list: state.image.main, entities: state.entities.image }),
+  state => ({ list: state.image.main }),
   { loadList, patch, destroy, post },
 )(ImageList);
 

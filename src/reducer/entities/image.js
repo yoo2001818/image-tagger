@@ -43,4 +43,4 @@ export function imageEntityReducer(state = {
   }
 }
 
-export default createEntitiesReducer('images', imageEntityReducer);
+export default createEntitiesReducer('image', imageEntityReducer);

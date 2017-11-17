@@ -2,9 +2,7 @@ import createEntitiesReducer from './entities';
 import { FETCH, PATCH, SET, DESTROY }
   from '../../action/tag';
 
-export function tagEntityReducer(state = {
-  imageTags: [],
-}, action) {
+export function tagEntityReducer(state = {}, action) {
   switch (action.type) {
     case FETCH:
     case PATCH:
