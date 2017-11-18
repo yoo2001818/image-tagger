@@ -1,0 +1,11 @@
+.tag-list {
+  display: block;
+  & > .list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0.2em;
+    & > .tag {
+      display: block;
+    }
+  }
+}

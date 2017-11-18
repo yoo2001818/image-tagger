@@ -1,0 +1,13 @@
+.tag-item {
+  display: block;
+  padding: 0.5em;
+  margin-bottom: 0.2em;
+  & > .color {
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+    width: 1.5em;
+    height: 1.5em;
+    vertical-align: middle;
+  }
+}

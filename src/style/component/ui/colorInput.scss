@@ -1,0 +1,19 @@
+.color-input {
+  position: relative;
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  border: 1px solid $grey-700;
+  & > .form {
+    border: none;
+    background: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+  }
+}
