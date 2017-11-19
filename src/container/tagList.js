@@ -34,7 +34,7 @@ class TagList extends Component {
 }
 
 export default connect(
-  state => ({ list: state.tag.main }),
+  state => ({ list: state.tag.list.main }),
   { loadList, patch, destroy, post },
 )(TagList);
 

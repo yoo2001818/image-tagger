@@ -33,7 +33,7 @@ class ImageList extends Component {
 }
 
 export default connect(
-  state => ({ list: state.image.main }),
+  state => ({ list: state.image.list.main }),
   { loadList, patch, destroy, post },
 )(ImageList);
 
