@@ -6,6 +6,7 @@ import api from './api';
 export const FETCH_LIST = 'image/fetchList';
 export const FETCH = 'image/fetch';
 export const PATCH = 'image/patch';
+export const RESET = 'image/reset';
 export const SET = 'image/set';
 export const ADD_TAG = 'image/addTag';
 export const REMOVE_TAG = 'image/removeTag';
@@ -34,6 +35,10 @@ export const patch = createAction(PATCH,
     api: api('PATCH', `/images/${id}`, { body: data }),
     schema: 'image',
   }));
+
+export const reset = createAction(RESET,
+  () => ({}),
+  (id) => ({ id }));
 
 export const set = createAction(SET,
   (id, data) => ({ data }),

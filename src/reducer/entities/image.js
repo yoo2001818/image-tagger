@@ -1,5 +1,7 @@
 import createEntitiesReducer from './entities';
-import { FETCH, PATCH, SET, ADD_TAG, REMOVE_TAG, SET_TAG, DESTROY }
+import checkModified from '../../util/checkModified';
+import getEntry from '../../util/getEntry';
+import { FETCH, PATCH, RESET, SET, ADD_TAG, REMOVE_TAG, SET_TAG, DESTROY }
   from '../../action/image';
 
 export function imageEntityReducer(state = {
@@ -15,6 +17,7 @@ export function imageEntityReducer(state = {
       }
       return Object.assign({}, state, {
         pending: false,
+        modified: null,
       });
     case DESTROY:
       if (action.meta.pending || action.error) {
@@ -23,20 +26,34 @@ export function imageEntityReducer(state = {
         });
       }
       return null;
+    case RESET:
+      return Object.assign({}, state, {
+        modified: null,
+      });
     case SET:
-      return Object.assign({}, state, action.payload.data);
+      return Object.assign({}, state, {
+        modified: checkModified(state, action.payload.data),
+      });
     case ADD_TAG:
       return Object.assign({}, state, {
-        imageTags: state.imageTags.concat(action.payload.data),
+        modified: checkModified(state, {
+          imageTags: getEntry(state, 'imageTags').concat(action.payload.data),
+        }),
       });
     case REMOVE_TAG:
       return Object.assign({}, state, {
-        imageTags: state.imageTags.filter((_, i) => i !== action.payload.tagId),
+        modified: checkModified(state, {
+          imageTags: getEntry(state, 'imageTags')
+            .filter((_, i) => i !== action.payload.tagId),
+        }),
       });
     case SET_TAG:
       return Object.assign({}, state, {
-        imageTags: state.imageTags.map(
-          (v, i) => i === action.payload.tagId ? action.payload.data : v),
+        modified: checkModified(state, {
+          imageTags: getEntry(state, 'imageTags')
+            .filter((v, i) => i === action.payload.tagId
+              ? action.payload.data : v),
+        }),
       });
     default:
       return state;

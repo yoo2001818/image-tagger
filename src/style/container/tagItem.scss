@@ -1,13 +1,74 @@
 .tag-item {
-  display: block;
-  padding: 0.5em;
-  margin-bottom: 0.2em;
-  & > .color {
-    margin: 0;
-    padding: 0;
-    display: inline-block;
-    width: 1.5em;
-    height: 1.5em;
-    vertical-align: middle;
+  &.modified > form {
+    background-color: $blue-200;
+    border: 1px solid $blue-600;
+  }
+  & > form {
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.4em;
+    margin-bottom: 0.2em;
+    border: 1px solid $grey-400;
+    border-radius: 3px;
+    & > .color {
+      display: inline-block;
+      flex: 0 0 auto;
+      margin: 0;
+      padding: 0;
+      width: 1.5em;
+      height: 1.5em;
+      vertical-align: middle;
+      border-radius: 3px;
+    }
+    & > .name-field {
+      flex: 1 1 0;
+      display: inline-block;
+      width: 100%;
+      padding: 0 0.2em;
+      & > .name {
+        display: inline-block;
+        box-sizing: border-box;
+        width: 100%;
+        border: none;
+        background: none;
+        padding: 0.3em;
+        margin: 0;
+      }
+    }
+    & > .delete, & > .save, & > .undo {
+      flex: 0 0 auto;
+      margin: 0;
+      padding: 0;
+      border: none;
+      background: none;
+      width: 1.5em;
+      color: $red-800;
+      @include fa-icon();
+      &:before {
+        content: $fa-var-times;
+      }
+      &:hover {
+        color: $red-700;
+      }
+    }
+    & > .save {
+      color: $green-800;
+      &:before {
+        content: $fa-var-check;
+      }
+      &:hover {
+        color: $green-700;
+      }
+    }
+    & > .undo {
+      color: $orange-800;
+      &:before {
+        content: $fa-var-undo;
+      }
+      &:hover {
+        color: $orange-700;
+      }
+    }
   }
 }

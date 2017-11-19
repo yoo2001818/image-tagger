@@ -6,6 +6,7 @@ import api from './api';
 export const FETCH_LIST = 'tag/fetchList';
 export const FETCH = 'tag/fetch';
 export const PATCH = 'tag/patch';
+export const RESET = 'tag/reset';
 export const SET = 'tag/set';
 export const DESTROY = 'tag/destroy';
 export const POST = 'tag/post';
@@ -32,6 +33,10 @@ export const patch = createAction(PATCH,
     schema: 'tag',
   }));
 
+export const reset = createAction(RESET,
+  () => ({}),
+  (id) => ({ id }));
+
 export const set = createAction(SET,
   (id, data) => ({ id, data }),
   (id, data) => ({ id }));
@@ -41,8 +46,12 @@ export const destroy = createAction(DESTROY,
   id => ({ id, api: api('DELETE', `/tags/${id}`), schema: 'tag' }));
 
 export const post = createAction(POST,
-  (data) => ({ data }),
-  (data) => ({ api: api('POST', '/tags', { body: data }), schema: 'tag' }));
+  (data, id) => ({ id, data }),
+  (data, id) => ({
+    id,
+    api: api('POST', '/tags', { body: data }),
+    schema: 'tag',
+  }));
 
 export function loadList(name, filter, reset) {
   return (dispatch, getState) => {

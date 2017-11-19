@@ -26,6 +26,7 @@ class TagList extends Component {
               <TagItem id={v} />
             </li>
           )) }
+          <TagItem id='new' isNew />
         </ul>
       </InfiniteScroll>
     );
