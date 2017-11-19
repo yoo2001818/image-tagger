@@ -1,8 +1,15 @@
 import listReducer from './list';
-import { FETCH_LIST, POST, DESTROY } from '../action/tag';
+import { SELECT, FETCH_LIST, POST, DESTROY } from '../action/tag';
 
-export default function tagReducer(state = { list: {} }, action) {
+export default function tagReducer(state = {
+  list: {},
+  selected: null,
+}, action) {
   switch (action.type) {
+    case SELECT:
+      return Object.assign({}, state, {
+        selected: action.payload.id,
+      });
     case FETCH_LIST:
       return Object.assign({}, state, {
         list: listReducer(state.list, action),

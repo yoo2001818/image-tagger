@@ -3,6 +3,7 @@ import { createAction } from 'redux-actions';
 import { genLoadList } from './list';
 import api from './api';
 
+export const SELECT = 'tag/select';
 export const FETCH_LIST = 'tag/fetchList';
 export const FETCH = 'tag/fetch';
 export const PATCH = 'tag/patch';
@@ -10,6 +11,8 @@ export const RESET = 'tag/reset';
 export const SET = 'tag/set';
 export const DESTROY = 'tag/destroy';
 export const POST = 'tag/post';
+
+export const select = createAction(SELECT, id => ({ id }));
 
 export const fetchList = createAction(FETCH_LIST,
   (name, filter, nextId) => ({ name, filter, nextId }),
