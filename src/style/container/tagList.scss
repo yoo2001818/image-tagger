@@ -1,5 +1,13 @@
 .tag-list {
   display: block;
+  padding: 0.2em 0;
+  & > .search {
+    padding: 0.2em;
+    & > input {
+      box-sizing: border-box;
+      width: 100%;
+    }
+  }
   & > .list {
     list-style-type: none;
     margin: 0;

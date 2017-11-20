@@ -7,6 +7,7 @@ export default class ColorInput extends PureComponent {
     super(props);
     this.state = {
       value: this.props.value || '#000',
+      focus: false,
     };
   }
   componentWillReceiveProps(nextProps) {
@@ -21,15 +22,23 @@ export default class ColorInput extends PureComponent {
     if (onChange) onChange(e);
     this.setState({ value: e.target.value });
   }
+  handleFocus(e) {
+    this.setState({ focus: true });
+  }
+  handleBlur(e) {
+    this.setState({ focus: false });
+  }
   render() {
-    const { value } = this.state;
+    const { value, focus } = this.state;
     const { className } = this.props;
     return (
-      <div className={classNames('color-input', className)}
+      <div className={classNames('color-input', className, { focus })}
         style={{ backgroundColor: value }}
       >
         <input type='color' {...this.props}
-          className='form' onChange={this.handleChange.bind(this)} />
+          className='form' onChange={this.handleChange.bind(this)}
+          onFocus={this.handleFocus.bind(this)}
+          onBlur={this.handleBlur.bind(this)} />
       </div>
     );
   }

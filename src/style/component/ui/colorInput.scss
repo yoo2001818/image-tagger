@@ -4,6 +4,11 @@
   width: 1.5em;
   height: 1.5em;
   border: 1px solid $grey-700;
+  box-sizing: border-box;
+  vertical-align: middle;
+  &.focus {
+    border: 3px solid rgba($blue-700, 0.8);
+  }
   & > .form {
     border: none;
     background: none;

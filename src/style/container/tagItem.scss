@@ -17,6 +17,7 @@
   }
   & > form {
     display: flex;
+    align-items: center;
     box-sizing: border-box;
     width: 100%;
     padding: 0.4em;
@@ -33,8 +34,8 @@
       flex: 0 0 auto;
       margin: 0;
       padding: 0;
-      width: 1.5em;
-      height: 1.5em;
+      width: 1.6em;
+      height: 1.6em;
       vertical-align: middle;
       border-radius: 3px;
     }
