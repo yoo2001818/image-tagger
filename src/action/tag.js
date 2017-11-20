@@ -58,7 +58,8 @@ export const post = createAction(POST,
 
 export function loadList(name, filter, reset) {
   return (dispatch, getState) => {
-    let res = genLoadList(getState().tag, name, filter, reset, fetchList);
+    let res = genLoadList(getState().tag.list,
+      name, filter, reset, fetchList);
     if (res != null) return dispatch(res);
     return Promise.resolve();
   };

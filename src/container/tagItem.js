@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import getEntry from '../util/getEntry';
 import ColorInput from '../component/ui/colorInput';
 
-import { reset, set, post, patch, destroy } from '../action/tag';
+import { select, reset, set, post, patch, destroy } from '../action/tag';
 
 // TODO FocusGroup
 class TagItem extends PureComponent {
@@ -33,10 +33,20 @@ class TagItem extends PureComponent {
     if (!confirm('Are you sure?')) return;
     this.props.destroy(this.props.id);
   }
+  handleSelect(e) {
+    if (this.props.selected) return;
+    if (this.props.isNew) return;
+    this.props.select(this.props.id);
+  }
   render() {
-    const { tag = {}, isNew } = this.props;
+    const { tag = {}, selected, isNew } = this.props;
     return (
-      <div className={classNames('tag-item', { modified: tag.modified })}>
+      <div
+        className={classNames('tag-item', {
+          modified: tag.modified, selected,
+        })}
+        onClick={this.handleSelect.bind(this)}
+      >
         <form onSubmit={this.handleSave.bind(this)}>
           <ColorInput className='color' value={getEntry(tag, 'color')}
             onChange={this.handleEdit.bind(this, 'color')}
@@ -54,7 +64,7 @@ class TagItem extends PureComponent {
           { tag.modified && (
             <button className='undo' onClick={this.handleUndo.bind(this)} />
           ) }
-          { !isNew && (
+          { selected && !isNew && (
             <button className='delete' onClick={this.handleDelete.bind(this)} />
           ) }
         </form>
@@ -70,7 +80,9 @@ TagItem.propTypes = {
 };
 
 export default connect(
-  ({ entities }, props) => ({ tag: entities.tag[props.id] }),
-  { reset, set, post, patch, destroy },
+  ({ entities, tag }, props) => ({
+    tag: entities.tag[props.id], selected: tag.selected === props.id,
+  }),
+  { select, reset, set, post, patch, destroy },
 )(TagItem);
 

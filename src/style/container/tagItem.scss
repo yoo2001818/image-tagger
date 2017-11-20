@@ -1,7 +1,19 @@
 .tag-item {
   &.modified > form {
+    background-color: $green-200;
+    border: 1px solid $green-600;
+    &:hover {
+      background-color: $green-100;
+      border: 1px solid $green-500;
+    }
+  }
+  &.selected > form {
     background-color: $blue-200;
     border: 1px solid $blue-600;
+    &:hover {
+      background-color: $blue-100;
+      border: 1px solid $blue-500;
+    }
   }
   & > form {
     display: flex;
@@ -9,8 +21,13 @@
     width: 100%;
     padding: 0.4em;
     margin-bottom: 0.2em;
+    background-color: $grey-100;
     border: 1px solid $grey-400;
     border-radius: 3px;
+    &:hover {
+      background-color: $grey-000;
+      border: 1px solid $grey-300;
+    }
     & > .color {
       display: inline-block;
       flex: 0 0 auto;

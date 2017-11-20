@@ -62,7 +62,8 @@ export const scan = createAction(SCAN,
 
 export function loadList(name, filter, reset) {
   return (dispatch, getState) => {
-    let res = genLoadList(getState().image, name, filter, reset, fetchList);
+    let res = genLoadList(getState().image.list,
+      name, filter, reset, fetchList);
     if (res != null) return dispatch(res);
     return Promise.resolve();
   };

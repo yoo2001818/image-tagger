@@ -24,7 +24,7 @@ router.get('/', async(req, res) => {
   })).serialize({ omitPivot: true });
   res.json({
     items: items,
-    nextId: items[19] && items[19].randomId,
+    nextId: items[19] && items[19].id,
   });
 });
 
