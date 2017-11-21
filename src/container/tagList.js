@@ -1,15 +1,16 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import InfiniteScroll from 'react-infinite-scroller';
 
 import TagItem from './tagItem';
-import TextInput from '../component/ui/textInput';
+import SearchInput from '../component/searchInput';
 
 import { loadList, patch, destroy, post } from '../action/tag';
 
 // TODO Move it to somewhere else
 function escapeRegExp(str) {
-  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+  return str.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&');
 }
 
 class TagList extends Component {
@@ -38,7 +39,7 @@ class TagList extends Component {
         loadMore={this.handleLoad.bind(this)}
       >
         <div className='search'>
-          <TextInput type='text' placeholder='Search...'
+          <SearchInput type='text' placeholder='Search...' isGlobal
             value={filter} onChange={this.handleFilterChange.bind(this)} />
         </div>
         <ul className='list'>
@@ -53,6 +54,10 @@ class TagList extends Component {
     );
   }
 }
+
+TagList.propTypes = {
+  filter: PropTypes.string,
+};
 
 export default connect(
   // TODO Reselect

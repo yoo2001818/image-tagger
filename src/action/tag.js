@@ -4,6 +4,7 @@ import { genLoadList } from './list';
 import api from './api';
 
 export const SELECT = 'tag/select';
+export const SEARCH = 'tag/search';
 export const FETCH_LIST = 'tag/fetchList';
 export const FETCH = 'tag/fetch';
 export const PATCH = 'tag/patch';

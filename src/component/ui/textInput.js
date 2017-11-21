@@ -4,12 +4,15 @@ import classNames from 'classnames';
 
 export default class TextInput extends PureComponent {
   render() {
+    // Seriously React?
+    const props = Object.assign({}, this.props);
+    delete props.inputRef;
     return (
       <input
         type='text'
-        {...this.props}
+        {...props}
         className={classNames('text-input-component', this.props.className)}
-        ref={v => this.input = v}
+        ref={this.props.inputRef}
       />
     );
   }
