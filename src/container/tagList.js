@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import InfiniteScroll from 'react-infinite-scroller';
@@ -6,14 +6,11 @@ import InfiniteScroll from 'react-infinite-scroller';
 import TagItem from './tagItem';
 import SearchInput from '../component/searchInput';
 
-import { loadList, patch, destroy, post } from '../action/tag';
+import filterEntities from '../util/filterEntities';
 
-// TODO Move it to somewhere else
-function escapeRegExp(str) {
-  return str.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&');
-}
+import { loadList, select } from '../action/tag';
 
-class TagList extends Component {
+class TagList extends PureComponent {
   constructor(props) {
     super(props);
     this.state = { filter: '' };
@@ -25,15 +22,18 @@ class TagList extends Component {
     this.props.loadList('main', {});
   }
   handleFilterChange(e) {
-    this.setState({ filter: e.target.value });
+    const { value } = e.target;
+    this.setState({ filter: value });
+    const { list = {}, entities = {}, select } = this.props;
+    let selectedId = filterEntities(list.items, value,
+      id => entities[id] && entities[id].name)[0];
+    if (selectedId != null) select(selectedId);
   }
   render() {
     const { filter } = this.state;
     const { list = {}, entities = {} } = this.props;
-    const regex = new RegExp(filter.split('').map(escapeRegExp).join('.*'));
-    const items = filter ? (list.items || []).filter(
-      id => entities[id] && regex.test(entities[id].name),
-    ) : (list.items || []);
+    const items = filterEntities(list.items, filter,
+      id => entities[id] && entities[id].name);
     return (
       <InfiniteScroll className='tag-list' hasMore={list.hasNext}
         loadMore={this.handleLoad.bind(this)}
@@ -62,6 +62,6 @@ TagList.propTypes = {
 export default connect(
   // TODO Reselect
   state => ({ list: state.tag.list.main, entities: state.entities.tag }),
-  { loadList, patch, destroy, post },
+  { loadList, select },
 )(TagList);
 
