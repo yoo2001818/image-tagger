@@ -1,13 +1,61 @@
 .image-item {
   display: block;
   width: 100%;
-  & > img {
-    width: 100%;
+  & > .viewport {
+    width: 320px;
+    height: 180px;
+    position: relative;
+    & > img {
+      width: 100%;
+    }
+    & > .svg-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      shape-rendering: crispEdges;
+      .bounding-box {
+        &.selected {
+          & > .bg, & > .fg {
+            stroke-width: 2px;
+          }
+          & > .shadow {
+            stroke-width: 4px;
+          }
+        }
+        & > .shadow, & > .bg, & > .fg {
+          stroke-width: 1px;
+          vector-effect: non-scaling-stroke;
+          fill: none;
+        }
+        & > .shadow {
+          stroke-width: 3px;
+          stroke: rgba(#000, 0.5);
+        }
+        & > .bg {
+          stroke: #000;
+        }
+        & > .fg {
+          stroke-dasharray: 4;
+          // animation: bounding-box-anim 1s linear infinite;
+          stroke: #FFF;
+        }
+      }
+    }
   }
   & > .path {
     width: 100%;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+  }
+}
+
+@keyframes bounding-box-anim {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 8;
   }
 }
