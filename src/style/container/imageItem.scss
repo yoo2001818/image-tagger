@@ -26,6 +26,14 @@
             display: block;
           }
         }
+        &.negative {
+          & > .shadow {
+            stroke: rgba(#fff, 0.5);
+          }
+          & > .bg {
+            stroke: #fff;
+          }
+        }
         & > .shadow, & > .bg, & > .fg {
           stroke-width: 1px;
           vector-effect: non-scaling-stroke;
@@ -39,7 +47,7 @@
           stroke: #000;
         }
         & > .fg {
-          stroke-dasharray: 4;
+          stroke-dasharray: 4 1;
           // animation: bounding-box-anim 1s linear infinite;
           stroke: #FFF;
         }
