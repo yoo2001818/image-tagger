@@ -15,12 +15,15 @@
       width: 100%;
       shape-rendering: crispEdges;
       .bounding-box {
-        &.selected {
+        &.active {
           & > .bg, & > .fg {
             stroke-width: 2px;
           }
           & > .shadow {
             stroke-width: 4px;
+          }
+          & > .handle {
+            display: block;
           }
         }
         & > .shadow, & > .bg, & > .fg {
@@ -39,6 +42,12 @@
           stroke-dasharray: 4;
           // animation: bounding-box-anim 1s linear infinite;
           stroke: #FFF;
+        }
+        & > .handle {
+          display: none;
+          stroke-width: 1px;
+          fill: #FFF;
+          stroke: #000;
         }
       }
     }
