@@ -8,6 +8,12 @@
     & > img {
       width: 100%;
     }
+    & > .test-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+    }
     & > .svg-overlay {
       position: absolute;
       top: 0;
