@@ -16,7 +16,8 @@ const IMAGE_HEIGHT = 180;
 
 const BoundingBox = connect(
   ({ entities }, { imageTag }) => ({ tag: entities.tag[imageTag.tagId] }),
-)(({ active, imageTag: { minX, minY, maxX, maxY }, tag: { color } }) => {
+)(({ active, imageTag: { minX, minY, maxX, maxY }, tag = {} }) => {
+  let color = tag.color || '#f0f';
   let negative = Color(color).luminosity() < 0.5;
   let x = minX * IMAGE_WIDTH;
   let y = minY * IMAGE_HEIGHT;
@@ -42,6 +43,15 @@ const BoundingBox = connect(
     </g>
   );
 });
+
+function getCursorPos(e, image) {
+  const { x, y, width, height } = image.getBoundingClientRect();
+  const { clientX, clientY } = e;
+  return {
+    x: (clientX - x) / width,
+    y: (clientY - y) / height,
+  };
+}
 
 class Viewport extends PureComponent {
   constructor(props) {
@@ -78,15 +88,6 @@ class Viewport extends PureComponent {
     return promise;
   }
   onClick(e) {
-    // Let's make a sample tag using flood fill....
-    const { x, y, width, height } = this.image.getBoundingClientRect();
-    const { clientX, clientY } = e.nativeEvent;
-    this.loadImage().then(() => {
-      let cursorX = (clientX - x) / width;
-      let cursorY = (clientY - y) / height;
-      console.log('Init');
-      this.props.onCreate(floodFill(this.getImageData(), cursorX, cursorY));
-    });
   }
   onMouseUp(e) {
 
@@ -98,6 +99,22 @@ class Viewport extends PureComponent {
     // click: select
     // ctrl+click: flood fill
     // shift+click: new
+    // Let's make a sample tag using flood fill....
+    const { x, y } = getCursorPos(e.nativeEvent, this.image);
+    this.loadImage().then(() => {
+      this.props.onCreate(floodFill(this.getImageData(), x, y));
+    });
+    // Register mousemove / mouseup event too.
+    let mouseMove = e => {
+      const { x, y } = getCursorPos(e, this.image);
+      console.log(x, y);
+    };
+    let mouseUp = e => {
+      window.removeEventListener('mousemove', mouseMove);
+      window.removeEventListener('mouseup', mouseUp);
+    };
+    window.addEventListener('mousemove', mouseMove);
+    window.addEventListener('mouseup', mouseUp);
   }
   render() {
     const { src, tags, selected } = this.props;
@@ -129,20 +146,25 @@ Viewport.propTypes = {
 };
 
 class ImageItem extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = { selected: null };
+  }
   handleCreateTag(data) {
-    console.log(data);
-    const { addTag, id, selectedTag } = this.props;
+    const { addTag, id, selectedTag, image } = this.props;
     addTag(id,
       Object.assign({}, data, { tag: selectedTag, tagId: selectedTag }));
+    this.setState({ selected: getEntry(image, 'imageTags').length });
   }
   render() {
     const { image } = this.props;
+    const { selected } = this.state;
     return (
       <div className='image-item'>
         <Viewport
           src={`/api/images/${image.id}/thumb`}
           rawSrc={`/api/images/${image.id}/raw`}
-          tags={getEntry(image, 'imageTags')} selected={0}
+          tags={getEntry(image, 'imageTags')} selected={selected}
           onCreate={this.handleCreateTag.bind(this)}
         />
         <ul className='image-tags'>
