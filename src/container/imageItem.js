@@ -3,12 +3,10 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Color from 'color';
-import { denormalize } from 'normalizr';
 
-import { image } from '../schema';
-import { addTag } from '../action/image';
+import { addTag, setTag } from '../action/image';
 
-import floodFill from '../util/floodFill';
+import floodFill, { colorDist } from '../util/floodFill';
 import getEntry from '../util/getEntry';
 
 const IMAGE_WIDTH = 320;
@@ -56,9 +54,6 @@ function getCursorPos(e, image) {
 class Viewport extends PureComponent {
   constructor(props) {
     super(props);
-    this.onClick = this.onClick.bind(this);
-    this.onMouseUp = this.onMouseUp.bind(this);
-    this.onMouseMove = this.onMouseMove.bind(this);
     this.onMouseDown = this.onMouseDown.bind(this);
   }
   getImageData() {
@@ -87,27 +82,40 @@ class Viewport extends PureComponent {
     this.rawImageLoad = promise;
     return promise;
   }
-  onClick(e) {
-  }
-  onMouseUp(e) {
-
-  }
-  onMouseMove(e) {
-
-  }
   onMouseDown(e) {
     // click: select
     // ctrl+click: flood fill
     // shift+click: new
     // Let's make a sample tag using flood fill....
     const { x, y } = getCursorPos(e.nativeEvent, this.image);
+    let lastPos = 0;
+    let imageData = null;
     this.loadImage().then(() => {
-      this.props.onCreate(floodFill(this.getImageData(), x, y));
+      imageData = this.getImageData();
+      lastPos = ((x * imageData.width | 0) +
+        (y * imageData.height | 0) * imageData.width) * 4;
+      this.props.onCreate(floodFill(imageData, x, y));
     });
     // Register mousemove / mouseup event too.
     let mouseMove = e => {
+      if (imageData == null) return;
       const { x, y } = getCursorPos(e, this.image);
+      if (x < 0 || x > 1 || y < 0 || y > 1) return;
+      let pos = ((x * imageData.width | 0) +
+        (y * imageData.height | 0) * imageData.width) * 4;
+      if (colorDist(imageData.data, pos, lastPos) < 15) return;
+      lastPos = pos;
       console.log(x, y);
+      // Expand the area
+      let area = floodFill(imageData, x, y);
+      let input = this.props.tags[this.props.selected];
+      let output = Object.assign({}, input, {
+        minX: Math.min(area.minX, input.minX),
+        maxX: Math.max(area.maxX, input.maxX),
+        minY: Math.min(area.minY, input.minY),
+        maxY: Math.max(area.maxY, input.maxY),
+      });
+      this.props.onChange(this.props.selected, output);
     };
     let mouseUp = e => {
       window.removeEventListener('mousemove', mouseMove);
@@ -119,9 +127,7 @@ class Viewport extends PureComponent {
   render() {
     const { src, tags, selected } = this.props;
     return (
-      <div className='viewport'
-        onClick={this.onClick} onMouseDown={this.onMouseDown}
-      >
+      <div className='viewport' onMouseDown={this.onMouseDown}>
         <img src={src} width={IMAGE_WIDTH} height={IMAGE_HEIGHT}
           ref={node => this.image = node} />
         <svg className='svg-overlay' width={IMAGE_WIDTH} height={IMAGE_HEIGHT}>
@@ -156,6 +162,10 @@ class ImageItem extends PureComponent {
       Object.assign({}, data, { tag: selectedTag, tagId: selectedTag }));
     this.setState({ selected: getEntry(image, 'imageTags').length });
   }
+  handleChangeTag(tagId, data) {
+    const { setTag, id } = this.props;
+    setTag(id, tagId, data);
+  }
   render() {
     const { image } = this.props;
     const { selected } = this.state;
@@ -166,6 +176,7 @@ class ImageItem extends PureComponent {
           rawSrc={`/api/images/${image.id}/raw`}
           tags={getEntry(image, 'imageTags')} selected={selected}
           onCreate={this.handleCreateTag.bind(this)}
+          onChange={this.handleChangeTag.bind(this)}
         />
         <ul className='image-tags'>
           <li className='tag'>
@@ -187,6 +198,6 @@ export default connect(
     image: entities.image[props.id],
     selectedTag: tag.selected,
   }),
-  { addTag }
+  { addTag, setTag }
 )(ImageItem);
 

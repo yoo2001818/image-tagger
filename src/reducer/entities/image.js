@@ -51,7 +51,7 @@ export function imageEntityReducer(state = {
       return Object.assign({}, state, {
         modified: checkModified(state, {
           imageTags: getEntry(state, 'imageTags')
-            .filter((v, i) => i === action.payload.tagId
+            .map((v, i) => i === action.payload.tagId
               ? action.payload.data : v),
         }),
       });

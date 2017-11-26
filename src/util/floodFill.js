@@ -1,4 +1,4 @@
-function colorDist(data, pos, targetPos) {
+export function colorDist(data, pos, targetPos) {
   let output = 0;
   for (let i = 0; i < 4; ++i) {
     let diff = data[pos + i] - data[targetPos + i];
