@@ -1,9 +1,9 @@
 .image-item {
   display: block;
-  width: 100%;
+  width: 480px;
   & > .viewport {
-    width: 320px;
-    height: 180px;
+    width: 480px;
+    height: 270px;
     position: relative;
     & > img {
       width: 100%;
@@ -56,6 +56,7 @@
           stroke-dasharray: 4 1;
           // animation: bounding-box-anim 1s linear infinite;
           stroke: #FFF;
+          fill: transparent;
         }
         & > .handle {
           display: none;

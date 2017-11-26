@@ -20,7 +20,7 @@ export default async function generateThumbnail(filePath) {
     // Convert the file
     await sharp(inputFile)
       .rotate()
-      .resize(320, null)
+      .resize(480, null)
       .toFile(outputFile);
   }
   return outputFile;
