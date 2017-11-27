@@ -25,6 +25,9 @@
           & > .bg, & > .fg {
             stroke-width: 2px;
           }
+          & > .fg {
+            fill: none;
+          }
           & > .shadow {
             stroke-width: 4px;
           }

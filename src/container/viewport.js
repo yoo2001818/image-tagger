@@ -27,6 +27,31 @@ function union(original, dest) {
   });
 }
 
+function subtract(original, dest, x, y) {
+  // Check if they overlap first
+  if (Math.min(original.maxX, dest.maxX) < Math.max(original.minX, dest.minX) ||
+    Math.min(original.maxY, dest.maxY) < Math.max(original.minY, dest.minY)
+  ) return original;
+  // Calculate distance between two midpoints
+  let xDist = x - (original.maxX + original.minX) / 2;
+  let yDist = y - (original.maxY + original.minY) / 2;
+  console.log(xDist, yDist);
+  console.log(original, dest);
+  if (Math.abs(xDist) > Math.abs(yDist)) {
+    if (original.maxX <= dest.maxX) {
+      return Object.assign({}, original, { maxX: dest.minX });
+    } else {
+      return Object.assign({}, original, { minX: dest.maxX });
+    }
+  } else {
+    if (original.maxY <= dest.maxY) {
+      return Object.assign({}, original, { maxY: dest.minY });
+    } else {
+      return Object.assign({}, original, { minY: dest.maxY });
+    }
+  }
+}
+
 function isInRect(rect, x, y) {
   return rect.minX <= x && x <= rect.maxX && rect.minY <= y && y <= rect.maxY;
 }
@@ -72,16 +97,16 @@ const BoundingBox = connect(
         onMouseDown={onMouseDown.bind(null, null, null)}
         className='fg' />
       <Rect x={x - 3} y={y - 3} width={7} height={7}
-        onMouseDown={onMouseDown.bind(null, 'minX', 'minY')}
+        onMouseDown={onMouseDown.bind(null, false, false)}
         className='handle top-left' />
       <Rect x={x + width - 3} y={y - 3} width={7} height={7}
-        onMouseDown={onMouseDown.bind(null, 'maxX', 'minY')}
+        onMouseDown={onMouseDown.bind(null, true, false)}
         className='handle top-right' />
       <Rect x={x - 3} y={y + height - 3} width={7} height={7}
-        onMouseDown={onMouseDown.bind(null, 'minX', 'maxY')}
+        onMouseDown={onMouseDown.bind(null, false, true)}
         className='handle bottom-left' />
       <Rect x={x + width - 3} y={y + height - 3} width={7} height={7}
-        onMouseDown={onMouseDown.bind(null, 'maxX', 'maxY')}
+        onMouseDown={onMouseDown.bind(null, true, true)}
         className='handle bottom-right' />
     </g>
   );
@@ -116,52 +141,118 @@ export default class Viewport extends PureComponent {
     this.rawImageLoad = promise;
     return promise;
   }
-  handleTagMouseDown(id, xName, yName, e) {
+  handleTagMouseDown(id, xType, yType, e) {
+    if (e.ctrlKey || e.shiftKey) return;
     // If xName or yName is specified, register mouseMove event -
     // move the property around.
     e.preventDefault();
     e.stopPropagation();
+    if (xType == null || yType == null) {
+      this.props.onSelect(id);
+    } else {
+      // TODO Rename database?
+      let xName = xType ? 'maxX' : 'minX';
+      let yName = yType ? 'maxY' : 'minY';
+      // First, calculate actual distance between cursor x and y.
+      const cursorPos = getCursorPos(e, this.image);
+      const input = this.props.tags[this.props.selected];
+      const xDiff = cursorPos.x - input[xName];
+      const yDiff = cursorPos.y - input[yName];
+      // Register mousemove / mouseup event too.
+      let mouseMove = e => {
+        const { x, y } = getCursorPos(e, this.image);
+        let xValue = x - xDiff;
+        let yValue = y - yDiff;
+        if (xType) xValue = Math.max(input.minX, xValue);
+        else xValue = Math.min(input.maxX, xValue);
+        if (yType) yValue = Math.max(input.minY, yValue);
+        else yValue = Math.min(input.maxY, yValue);
+        let output = Object.assign({}, input, {
+          [xName]: xValue,
+          [yName]: yValue,
+        });
+        this.props.onChange(this.props.selected, output);
+      };
+      let mouseUp = e => {
+        window.removeEventListener('mousemove', mouseMove);
+        window.removeEventListener('mouseup', mouseUp);
+      };
+      window.addEventListener('mousemove', mouseMove);
+      window.addEventListener('mouseup', mouseUp);
+    }
   }
   handleMouseDown(e) {
     // click: select
-    // ctrl+click: flood fill
-    // shift+click: new
-    // Let's make a sample tag using flood fill....
-    const { x, y } = getCursorPos(e.nativeEvent, this.image);
-    let imageData = null;
-    this.loadImage().then(() => {
-      imageData = this.getImageData();
-      this.props.onAdd(floodFill(imageData, x, y));
-    });
-    // Register mousemove / mouseup event too.
-    let mouseMove = e => {
-      if (imageData == null) return;
-      const { x, y } = getCursorPos(e, this.image);
-      let input = this.props.tags[this.props.selected];
-      if (x < 0 || x > 1 || y < 0 || y > 1) return;
-      if (isInRect(input, x, y)) return;
-      // Expand the area
-      let area = floodFill(imageData, x, y);
-      this.props.onChange(this.props.selected, union(input, area));
-    };
-    let mouseUp = e => {
-      window.removeEventListener('mousemove', mouseMove);
-      window.removeEventListener('mouseup', mouseUp);
-    };
-    window.addEventListener('mousemove', mouseMove);
-    window.addEventListener('mouseup', mouseUp);
+    // shift+click: flood fill
+    // ctrl+click: new
+    if (e.ctrlKey || e.shiftKey) {
+      const shiftKey = e.shiftKey;
+      const ctrlKey = e.ctrlKey;
+      e.preventDefault();
+      const handleUnion = (x, y) => {
+        if (imageData == null) return;
+        let input = this.props.tags[this.props.selected];
+        // Expand the area
+        let area = floodFill(imageData, x, y);
+        let output;
+        if (ctrlKey && shiftKey) {
+          output = subtract(input, area, x, y);
+        } else {
+          output = union(input, area);
+        }
+        this.props.onChange(this.props.selected, output);
+      };
+      let imageData = null;
+      const { x, y } = getCursorPos(e.nativeEvent, this.image);
+      this.loadImage().then(() => {
+        imageData = this.getImageData();
+        if ((ctrlKey && !shiftKey) ||
+            this.props.tags[this.props.selected] == null
+        ) {
+          this.props.onAdd(floodFill(imageData, x, y));
+        } else {
+          handleUnion(x, y);
+        }
+      });
+      // Register mousemove / mouseup event too.
+      let mouseMove = e => {
+        const { x, y } = getCursorPos(e, this.image);
+        if (x < 0 || x > 1 || y < 0 || y > 1) return;
+        let input = this.props.tags[this.props.selected];
+        if (!(ctrlKey && shiftKey) && isInRect(input, x, y)) return;
+        handleUnion(x, y);
+      };
+      let mouseUp = e => {
+        window.removeEventListener('mousemove', mouseMove);
+        window.removeEventListener('mouseup', mouseUp);
+      };
+      window.addEventListener('mousemove', mouseMove);
+      window.addEventListener('mouseup', mouseUp);
+    }
   }
   render() {
     const { src, tags, selected } = this.props;
+    // Reorder tags - 0 ~ selected tags should be rendered first,
+    // then selected ~ N tags should be rendered, while reversed.
+    // selected tag should be rendered at last.
+    let tagsResult;
+    if (tags.length > 0 && tags[selected] != null) {
+      let tagsMapped = tags.map((value, id) => ({ value, id }));
+      tagsResult = tagsMapped.slice(0, selected).reverse().concat(
+        tagsMapped.slice(selected).reverse(),
+      );
+    } else {
+      tagsResult = [];
+    }
     return (
       <div className='viewport' onMouseDown={this.handleMouseDown}>
         <img src={src} width={IMAGE_WIDTH} height={IMAGE_HEIGHT}
           ref={node => this.image = node} />
         <svg className='svg-overlay' width={IMAGE_WIDTH} height={IMAGE_HEIGHT}>
-          { tags.map((tag, i) => (
-            <BoundingBox imageTag={tag} color={tag.tag && tag.tag.color}
-              active={i === selected} key={i}
-              onMouseDown={this.handleTagMouseDown.bind(this, i)} />
+          { tagsResult.map((v) => (
+            <BoundingBox imageTag={v.value}
+              active={v.id === selected} key={v.id}
+              onMouseDown={this.handleTagMouseDown.bind(this, v.id)} />
           )) }
         </svg>
       </div>
