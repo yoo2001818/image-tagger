@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Color from 'color';
 
-import floodFill, { colorDist } from '../util/floodFill';
+import floodFill from '../util/floodFill';
 
 const IMAGE_WIDTH = 480;
 const IMAGE_HEIGHT = 270;
@@ -25,6 +25,10 @@ function union(original, dest) {
     minY: Math.min(original.minY, dest.minY),
     maxY: Math.max(original.maxY, dest.maxY),
   });
+}
+
+function isInRect(rect, x, y) {
+  return rect.minX <= x && x <= rect.maxX && rect.minY <= y && y <= rect.maxY;
 }
 
 // Workaround for React SVG bug..
@@ -124,27 +128,20 @@ export default class Viewport extends PureComponent {
     // shift+click: new
     // Let's make a sample tag using flood fill....
     const { x, y } = getCursorPos(e.nativeEvent, this.image);
-    let lastPos = 0;
     let imageData = null;
     this.loadImage().then(() => {
       imageData = this.getImageData();
-      lastPos = ((x * imageData.width | 0) +
-        (y * imageData.height | 0) * imageData.width) * 4;
       this.props.onAdd(floodFill(imageData, x, y));
     });
     // Register mousemove / mouseup event too.
     let mouseMove = e => {
       if (imageData == null) return;
       const { x, y } = getCursorPos(e, this.image);
+      let input = this.props.tags[this.props.selected];
       if (x < 0 || x > 1 || y < 0 || y > 1) return;
-      let pos = ((x * imageData.width | 0) +
-        (y * imageData.height | 0) * imageData.width) * 4;
-      if (colorDist(imageData.data, pos, lastPos) < 15) return;
-      lastPos = pos;
-      console.log(x, y);
+      if (isInRect(input, x, y)) return;
       // Expand the area
       let area = floodFill(imageData, x, y);
-      let input = this.props.tags[this.props.selected];
       this.props.onChange(this.props.selected, union(input, area));
     };
     let mouseUp = e => {
