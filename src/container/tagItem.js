@@ -50,13 +50,20 @@ class TagItem extends PureComponent {
         <form onSubmit={this.handleSave.bind(this)}>
           <ColorInput className='color' value={getEntry(tag, 'color')}
             onChange={this.handleEdit.bind(this, 'color')}
+            disabled={!isNew && !tag.modified && !selected}
           />
           <div className='name-field'>
-            <input type='text' className='name'
-              placeholder={isNew ? 'New tag...' : ''}
-              value={getEntry(tag, 'name') || ''}
-              onChange={this.handleEdit.bind(this, 'name')}
-            />
+            { (isNew || tag.modified || selected) ? (
+              <input type='text' className='name'
+                placeholder={isNew ? 'New tag...' : ''}
+                value={getEntry(tag, 'name') || ''}
+                onChange={this.handleEdit.bind(this, 'name')}
+              />
+            ) : (
+              <span className='name'>
+                {getEntry(tag, 'name')}
+              </span>
+            ) }
           </div>
           { tag.modified && (
             <button className='save' onClick={this.handleSave.bind(this)} />
