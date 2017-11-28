@@ -158,6 +158,7 @@ export default class Viewport extends PureComponent {
       const input = this.props.tags[this.props.selected];
       const xDiff = cursorPos.x - input[xName];
       const yDiff = cursorPos.y - input[yName];
+      this.props.onChange(this.props.selected, input, true);
       // Register mousemove / mouseup event too.
       let mouseMove = e => {
         const { x, y } = getCursorPos(e, this.image);
@@ -189,7 +190,7 @@ export default class Viewport extends PureComponent {
       const shiftKey = e.shiftKey;
       const ctrlKey = e.ctrlKey;
       e.preventDefault();
-      const handleUnion = (x, y) => {
+      const handleUnion = (x, y, undoable) => {
         if (imageData == null) return;
         let input = this.props.tags[this.props.selected];
         // Expand the area
@@ -200,7 +201,7 @@ export default class Viewport extends PureComponent {
         } else {
           output = union(input, area);
         }
-        this.props.onChange(this.props.selected, output);
+        this.props.onChange(this.props.selected, output, undoable);
       };
       let imageData = null;
       const { x, y } = getCursorPos(e.nativeEvent, this.image);
@@ -209,9 +210,9 @@ export default class Viewport extends PureComponent {
         if ((ctrlKey && !shiftKey) ||
             this.props.tags[this.props.selected] == null
         ) {
-          this.props.onAdd(floodFill(imageData, x, y));
+          this.props.onAdd(floodFill(imageData, x, y), true);
         } else {
-          handleUnion(x, y);
+          handleUnion(x, y, true);
         }
       });
       // Register mousemove / mouseup event too.
@@ -236,13 +237,13 @@ export default class Viewport extends PureComponent {
     // then selected ~ N tags should be rendered, while reversed.
     // selected tag should be rendered at last.
     let tagsResult;
-    if (tags.length > 0 && tags[selected] != null) {
-      let tagsMapped = tags.map((value, id) => ({ value, id }));
+    let tagsMapped = tags.map((value, id) => ({ value, id }));
+    if (tags[selected] != null) {
       tagsResult = tagsMapped.slice(0, selected).reverse().concat(
         tagsMapped.slice(selected).reverse(),
       );
     } else {
-      tagsResult = [];
+      tagsResult = tagsMapped;
     }
     return (
       <div className='viewport' onMouseDown={this.handleMouseDown}>

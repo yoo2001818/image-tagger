@@ -10,6 +10,10 @@ export default class SearchInput extends PureComponent {
     this.node = null;
   }
   handleKeyDown(e) {
+    // 48-57, 65-90
+    if (e.ctrlKey || e.shiftKey || e.altKey) return;
+    if (!((e.keyCode >= 48 && e.keyCode <= 57) ||
+      (e.keyCode >= 65 && e.keyCode <= 90))) return;
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     if (this.node == null) return;
     this.node.value = '';

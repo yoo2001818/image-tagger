@@ -6,36 +6,49 @@ import getEntry from '../util/getEntry';
 
 import Viewport from './viewport';
 
-import { addTag, setTag, removeTag } from '../action/image';
+import { addTag, setTag, removeTag, undo, redo } from '../action/image';
 
 class ImageItem extends PureComponent {
   constructor(props) {
     super(props);
     this.state = { selected: null };
   }
-  handleAddTag(data) {
+  handleAddTag(data, undoable) {
     const { addTag, id, selectedTag, image } = this.props;
     addTag(id,
-      Object.assign({}, data, { tag: selectedTag, tagId: selectedTag }));
+      Object.assign({}, data, { tag: selectedTag, tagId: selectedTag }),
+      undoable);
     this.setState({ selected: getEntry(image, 'imageTags').length });
   }
-  handleChangeTag(tagId, data) {
+  handleChangeTag(tagId, data, undoable) {
     const { setTag, id } = this.props;
-    setTag(id, tagId, data);
+    setTag(id, tagId, data, undoable);
   }
-  handleRemoveTag(tagId) {
+  handleRemoveTag(tagId, undoable) {
     const { removeTag, id } = this.props;
-    removeTag(id, tagId);
+    removeTag(id, tagId, undoable);
     this.setState({ selected: this.state.selected - 1 });
   }
   handleSelectTag(tagId) {
     this.setState({ selected: tagId });
   }
+  handleKeyDown(e) {
+    if (e.ctrlKey && e.keyCode === 90) {
+      this.props.undo(this.props.id);
+      e.preventDefault();
+    }
+    if (e.ctrlKey && e.keyCode === 89) {
+      this.props.redo(this.props.id);
+      e.preventDefault();
+    }
+  }
   render() {
     const { image } = this.props;
     const { selected } = this.state;
     return (
-      <div className='image-item'>
+      <div className='image-item' tabIndex={0}
+        onKeyDown={this.handleKeyDown.bind(this)}
+      >
         <Viewport
           src={`/api/images/${image.id}/thumb`}
           rawSrc={`/api/images/${image.id}/raw`}
@@ -65,6 +78,6 @@ export default connect(
     image: entities.image[props.id],
     selectedTag: tag.selected,
   }),
-  { addTag, setTag, removeTag }
+  { addTag, setTag, removeTag, undo, redo }
 )(ImageItem);
 

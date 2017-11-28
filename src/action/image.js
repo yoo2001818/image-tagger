@@ -11,6 +11,8 @@ export const SET = 'image/set';
 export const ADD_TAG = 'image/addTag';
 export const REMOVE_TAG = 'image/removeTag';
 export const SET_TAG = 'image/setTag';
+export const UNDO = 'image/undo';
+export const REDO = 'image/redo';
 export const DESTROY = 'image/destroy';
 export const SCAN = 'image/scan';
 
@@ -42,19 +44,27 @@ export const reset = createAction(RESET,
 
 export const set = createAction(SET,
   (id, data) => ({ data }),
-  (id, data) => ({ id }));
+  (id, data, undoable) => ({ id, undoable }));
 
 export const addTag = createAction(ADD_TAG,
   (id, data) => ({ data }),
-  (id) => ({ id }));
+  (id, data, undoable) => ({ id, undoable }));
 
 export const removeTag = createAction(REMOVE_TAG,
   (id, tagId) => ({ tagId }),
-  (id, tagId) => ({ id, tagId }));
+  (id, tagId, undoable) => ({ id, tagId, undoable }));
 
 export const setTag = createAction(SET_TAG,
   (id, tagId, data) => ({ tagId, data }),
-  (id, tagId) => ({ id, tagId }));
+  (id, tagId, data, undoable) => ({ id, tagId, undoable }));
+
+export const undo = createAction(UNDO,
+  () => ({}),
+  (id) => ({ id }));
+
+export const redo = createAction(REDO,
+  () => ({}),
+  (id) => ({ id }));
 
 export const scan = createAction(SCAN,
   () => {},
