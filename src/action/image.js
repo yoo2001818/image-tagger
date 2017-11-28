@@ -81,16 +81,18 @@ export function loadList(name, filter, reset) {
 
 export function load(id) {
   return (dispatch, getState) => {
-    let { images } = getState().entities;
-    if (images[id] == null) return dispatch(fetch(id));
+    let { image } = getState().entities;
+    if (image[id] == null) return dispatch(fetch(id));
     return Promise.resolve();
   };
 }
 
 export function save(id) {
   return (dispatch, getState) => {
-    let { images } = getState().entities;
-    if (images[id].dirty) return dispatch(patch(id, images[id]));
+    let { image } = getState().entities;
+    if (image[id].modified != null) {
+      return dispatch(patch(id, image[id].modified));
+    }
     return Promise.resolve();
   };
 }

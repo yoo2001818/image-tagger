@@ -116,6 +116,7 @@ export default class Viewport extends PureComponent {
   constructor(props) {
     super(props);
     this.handleMouseDown = this.handleMouseDown.bind(this);
+    this.handleContextMenu = this.handleContextMenu.bind(this);
   }
   getImageData() {
     if (this.imageData != null) return this.imageData;
@@ -143,6 +144,7 @@ export default class Viewport extends PureComponent {
   }
   handleTagMouseDown(id, xType, yType, e) {
     if (e.ctrlKey || e.shiftKey) return;
+    if (this.props.onMouseDown) this.props.onMouseDown(e);
     // If xName or yName is specified, register mouseMove event -
     // move the property around.
     e.preventDefault();
@@ -186,6 +188,12 @@ export default class Viewport extends PureComponent {
     // click: select
     // shift+click: flood fill
     // ctrl+click: new
+    if (this.props.onMouseDown) this.props.onMouseDown(e);
+    if (e.ctrlKey && e.button === 2) {
+      e.preventDefault();
+      this.props.onRemove(this.props.selected);
+      return;
+    }
     if (e.ctrlKey || e.shiftKey) {
       const shiftKey = e.shiftKey;
       const ctrlKey = e.ctrlKey;
@@ -231,6 +239,9 @@ export default class Viewport extends PureComponent {
       window.addEventListener('mouseup', mouseUp);
     }
   }
+  handleContextMenu(e) {
+    e.preventDefault();
+  }
   render() {
     const { src, tags, selected } = this.props;
     // Reorder tags - 0 ~ selected tags should be rendered first,
@@ -246,7 +257,9 @@ export default class Viewport extends PureComponent {
       tagsResult = tagsMapped;
     }
     return (
-      <div className='viewport' onMouseDown={this.handleMouseDown}>
+      <div className='viewport' onMouseDown={this.handleMouseDown}
+        onContextMenu={this.handleContextMenu}
+      >
         <img src={src} width={IMAGE_WIDTH} height={IMAGE_HEIGHT}
           ref={node => this.image = node} />
         <svg className='svg-overlay' width={IMAGE_WIDTH} height={IMAGE_HEIGHT}>
@@ -268,6 +281,8 @@ Viewport.propTypes = {
   selected: PropTypes.number,
   onChange: PropTypes.func,
   onAdd: PropTypes.func,
+  onRemove: PropTypes.func,
   onSelect: PropTypes.func,
+  onMouseDown: PropTypes.func,
 };
 

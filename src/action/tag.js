@@ -77,7 +77,9 @@ export function load(id) {
 export function save(id) {
   return (dispatch, getState) => {
     let { tags } = getState().entities;
-    if (tags[id].dirty) return dispatch(patch(id, tags[id]));
+    if (tags[id].modified != null) {
+      return dispatch(patch(id, tags[id].modified));
+    }
     return Promise.resolve();
   };
 }

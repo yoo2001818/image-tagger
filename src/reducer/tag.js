@@ -21,7 +21,7 @@ export default function tagReducer(state = {
       return Object.assign({}, state, {
         list: Object.assign({}, state.list, {
           main: Object.assign({}, state.list.main, {
-            items: state.main.items.concat([action.payload.result]),
+            items: state.list.main.items.concat([action.payload.result]),
           }),
         }),
       });
@@ -32,7 +32,7 @@ export default function tagReducer(state = {
       return Object.assign({}, state, {
         list: Object.assign({}, state.list, {
           main: Object.assign({}, state.list.main, {
-            items: state.main.items.filter(v => v !== action.meta.id),
+            items: state.list.main.items.filter(v => v !== action.meta.id),
           }),
         }),
       });

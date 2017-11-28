@@ -1,12 +1,32 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 
 import getEntry from '../util/getEntry';
 
+import Button from '../component/ui/button';
 import Viewport from './viewport';
 
-import { addTag, setTag, removeTag, undo, redo } from '../action/image';
+import { addTag, setTag, removeTag, undo, redo, save, reset }
+  from '../action/image';
+
+const ImageTag = connect(
+  ({ entities }, { imageTag }) => ({ tag: entities.tag[imageTag.tagId] }),
+)(({
+  selected,
+  tag = {},
+  onClick,
+}) => {
+  let color = tag.color || '#f0f';
+  return (
+    <button className={classNames('image-tag', { selected })}
+      title={tag.name}
+      style={{ backgroundColor: color }}
+      onClick={onClick}
+    />
+  );
+});
 
 class ImageItem extends PureComponent {
   constructor(props) {
@@ -42,28 +62,63 @@ class ImageItem extends PureComponent {
       e.preventDefault();
     }
   }
+  handleMouseDown() {
+    this.node.focus();
+  }
+  handleTagClick(tagId, e) {
+    e.preventDefault();
+    this.handleSelectTag(tagId);
+  }
+  handleSave() {
+    this.props.save(this.props.id);
+  }
+  handleReset() {
+    this.props.reset(this.props.id);
+  }
   render() {
     const { image } = this.props;
     const { selected } = this.state;
+    const tags = getEntry(image, 'imageTags');
     return (
       <div className='image-item' tabIndex={0}
         onKeyDown={this.handleKeyDown.bind(this)}
+        ref={node => this.node = node}
       >
         <Viewport
           src={`/api/images/${image.id}/thumb`}
           rawSrc={`/api/images/${image.id}/raw`}
-          tags={getEntry(image, 'imageTags')} selected={selected}
+          tags={tags} selected={selected}
           onAdd={this.handleAddTag.bind(this)}
           onChange={this.handleChangeTag.bind(this)}
           onRemove={this.handleRemoveTag.bind(this)}
           onSelect={this.handleSelectTag.bind(this)}
+          onMouseDown={this.handleMouseDown.bind(this)}
         />
         <ul className='image-tags'>
-          <li className='tag'>
-            Test
-          </li>
+          { tags.map((v, i) => (
+            <li className='tag' key={i}>
+              <ImageTag imageTag={v} selected={selected === i}
+                onClick={this.handleTagClick.bind(this, i)} />
+            </li>
+          )) }
         </ul>
         <div className='path'>{ image.path }</div>
+        <div className='actions'>
+          { image.modified && (
+            <Button className='green save'
+              onClick={this.handleSave.bind(this)}
+            >
+              저장
+            </Button>
+          ) }
+          { image.modified && (
+            <Button className='orange undo'
+              onClick={this.handleReset.bind(this)}
+            >
+              되돌리기
+            </Button>
+          ) }
+        </div>
       </div>
     );
   }
@@ -78,6 +133,6 @@ export default connect(
     image: entities.image[props.id],
     selectedTag: tag.selected,
   }),
-  { addTag, setTag, removeTag, undo, redo }
+  { addTag, setTag, removeTag, undo, redo, save, reset }
 )(ImageItem);
 
