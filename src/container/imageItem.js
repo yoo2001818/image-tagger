@@ -8,7 +8,7 @@ import getEntry from '../util/getEntry';
 import Button from '../component/ui/button';
 import Viewport from './viewport';
 
-import { addTag, setTag, removeTag, undo, redo, save, reset }
+import { addTag, setTag, removeTag, set, undo, redo, save, reset }
   from '../action/image';
 
 const ImageTag = connect(
@@ -75,6 +75,9 @@ class ImageItem extends PureComponent {
   handleReset() {
     this.props.reset(this.props.id);
   }
+  handleChange(name, e) {
+    this.props.set(this.props.id, { [name]: e.target.checked });
+  }
   render() {
     const { image } = this.props;
     const { selected } = this.state;
@@ -103,6 +106,20 @@ class ImageItem extends PureComponent {
           )) }
         </ul>
         <div className='path'>{ image.path }</div>
+        <div className='checkboxes'>
+          <label>
+            <input type='checkbox' name='isProcessed'
+              checked={getEntry(image, 'isProcessed')}
+              onChange={this.handleChange.bind(this, 'isProcessed')} />
+            완료
+          </label>
+          <label>
+            <input type='checkbox' name='isIgnored'
+              checked={getEntry(image, 'isIgnored')}
+              onChange={this.handleChange.bind(this, 'isIgnored')} />
+            무시
+          </label>
+        </div>
         <div className='actions'>
           { image.modified && (
             <Button className='green save'
@@ -133,6 +150,6 @@ export default connect(
     image: entities.image[props.id],
     selectedTag: tag.selected,
   }),
-  { addTag, setTag, removeTag, undo, redo, save, reset }
+  { addTag, setTag, removeTag, set, undo, redo, save, reset }
 )(ImageItem);
 
