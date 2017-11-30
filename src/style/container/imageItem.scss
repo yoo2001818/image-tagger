@@ -16,6 +16,9 @@
     white-space: nowrap;
     text-overflow: ellipsis;
   }
+  & > .actions {
+    text-align: right;
+  }
 }
 
 .image-tag {

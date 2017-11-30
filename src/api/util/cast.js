@@ -26,7 +26,7 @@ export default function cast(schema, value) {
         output[key] = parseInt(value[key], 10);
         break;
       case 'boolean':
-        output[key] = ['1', 'true', 'yes', 'Y'].includes(value[key]);
+        output[key] = [true, '1', 'true', 'yes', 'Y'].includes(value[key]);
         break;
     }
   }
