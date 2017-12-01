@@ -20,11 +20,15 @@ router.get('/', async(req, res) => {
   const args = cast({
     nextId: 'number',
     isProcessed: 'boolean',
+    isIgnored: 'boolean',
     desc: 'boolean',
   }, req.query);
   let query = Image.forge().orderBy('randomId', args.desc ? 'desc' : 'asc');
   if (args.isProcessed != null) {
     query = query.where('isProcessed', '=', args.isProcessed);
+  }
+  if (args.isIgnored != null) {
+    query = query.where('isIgnored', '=', args.isIgnored);
   }
   if (args.nextId != null) {
     query = query.where('randomId', args.desc ? '<' : '>', args.nextId);

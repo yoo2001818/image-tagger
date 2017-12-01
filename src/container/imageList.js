@@ -16,7 +16,7 @@ class SelectInput extends Component {
   render() {
     const { value, values = [] } = this.props;
     return (
-      <select value={values.findIndex(v => v.value === v) || 0}
+      <select value={values.findIndex(v => v.value === value) || 0}
         onChange={this.handleChange.bind(this)}
       >
         { values.map((entry, i) => (
@@ -38,13 +38,16 @@ class ImageList extends Component {
     this.props.loadList('main', {}, true);
   }
   handleLoad() {
-    this.props.loadList('main', {});
+    const { list = {} } = this.props;
+    this.props.loadList('main', list.filter || {});
   }
-  handleChange() {
-
+  handleChange(name, e) {
+    const { list = {} } = this.props;
+    this.props.loadList('main',
+      Object.assign({}, list.filter, { [name]: e.target.value }), true);
   }
   render() {
-    const { list = {} } = this.props;
+    const { list = { filter: {} } } = this.props;
     const items = list.items || [];
     return (
       <InfiniteScroll className='image-list' hasMore={list.hasNext}
@@ -53,20 +56,24 @@ class ImageList extends Component {
         <div className='filter'>
           <label>
             완료
-            <SelectInput values={[
-              { name: '모두', value: null },
-              { name: '완료 안함', value: false },
-              { name: '완료함', value: true },
-            ]} value={list.filter.isProcessed}
+            <SelectInput
+              values={[
+                { name: '모두', value: null },
+                { name: '완료 안함', value: false },
+                { name: '완료함', value: true },
+              ]}
+              value={list.filter.isProcessed}
               onChange={this.handleChange.bind(this, 'isProcessed')} />
           </label>
           <label>
             무시
-            <SelectInput values={[
-              { name: '모두', value: null },
-              { name: '무시 안함', value: false },
-              { name: '무시함', value: true },
-            ]} value={list.filter.isIgnored}
+            <SelectInput
+              values={[
+                { name: '모두', value: null },
+                { name: '무시 안함', value: false },
+                { name: '무시함', value: true },
+              ]}
+              value={list.filter.isIgnored}
               onChange={this.handleChange.bind(this, 'isIgnored')} />
           </label>
         </div>
